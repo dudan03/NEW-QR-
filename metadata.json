@@ -1,0 +1,6 @@
+{
+  "name": "Repair Khata",
+  "description": "Clean, fast, professional repair shop management and customer khata ledger system for Indian businesses.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
