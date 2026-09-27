@@ -7,12 +7,7 @@ import {
   Download,
   Share2,
   X,
-  CheckCircle2,
-  AlertCircle,
   FileText,
-  ShieldCheck,
-  MapPin,
-  Phone,
 } from 'lucide-react';
 
 interface ReceiptModalProps {
@@ -112,6 +107,7 @@ Split UPI QR does not process, hold, or settle funds.
     link.href = url;
     link.download = `Receipt-${session.id}.txt`;
     link.click();
+    document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
 
@@ -130,7 +126,7 @@ Split UPI QR does not process, hold, or settle funds.
             <button
               type="button"
               onClick={handlePrint}
-              className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
               title={t.actions.printReceipt}
             >
               <Printer className="w-4 h-4" />
@@ -138,7 +134,7 @@ Split UPI QR does not process, hold, or settle funds.
             <button
               type="button"
               onClick={handleDownloadText}
-              className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
               title={t.actions.downloadReceipt}
             >
               <Download className="w-4 h-4" />
@@ -146,7 +142,7 @@ Split UPI QR does not process, hold, or settle funds.
             <button
               type="button"
               onClick={handleShare}
-              className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
               title={t.actions.shareQr}
             >
               <Share2 className="w-4 h-4" />
@@ -154,7 +150,7 @@ Split UPI QR does not process, hold, or settle funds.
             <button
               type="button"
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors ml-1"
+              className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors ml-1 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -329,14 +325,14 @@ Split UPI QR does not process, hold, or settle funds.
           <button
             type="button"
             onClick={onClose}
-            className="h-10 px-4 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors"
+            className="h-10 px-4 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
           >
             Close
           </button>
           <button
             type="button"
             onClick={handlePrint}
-            className="h-10 px-4 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:scale-[0.98] rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+            className="h-10 px-4 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:scale-[0.98] rounded-xl transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
           >
             <Printer className="w-4 h-4" />
             <span>{t.actions.printReceipt}</span>

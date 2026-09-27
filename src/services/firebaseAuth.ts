@@ -1,7 +1,5 @@
-import { FirebaseApp } from 'firebase/app';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import {
-  getAuth,
   RecaptchaVerifier,
   signInWithPhoneNumber,
   ConfirmationResult,
@@ -15,80 +13,60 @@ import {
 import {
   initializeAppCheck,
   ReCaptchaEnterpriseProvider,
-  ReCaptchaV3Provider,
   AppCheck,
 } from 'firebase/app-check';
-import { app as defaultApp, appCheck as defaultAppCheck, firebaseConfig as baseFirebaseConfig } from './firebase';
+import { app, auth, db, isFirebaseConfigured, firebaseConfig } from './firebaseConfig';
 
-// Client-safe Firebase configuration
-// In production, these values are populated from VITE_ environment variables
-export const firebaseConfig = {
-  ...baseFirebaseConfig,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-EXHTWEYD5K',
-  reCaptchaSiteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY || '',
-  googleClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || '225096409177-umb4hm62eeig172d00olmiov4q6hsoen.apps.googleusercontent.com',
+export { isFirebaseConfigured, firebaseConfig };
+
+// Re-export auth instance (null if unconfigured)
+export const getFirebaseAuth = (): Auth | null => auth;
+
+// Client-safe configuration for non-sensitive data
+const clientConfig = {
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  reCaptchaSiteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY,
 };
 
-// Singleton instances
-let appInstance: FirebaseApp = defaultApp;
-let authInstance: Auth | null = null;
-let appCheckInstance: AppCheck | null = defaultAppCheck;
+let appCheckInstance: AppCheck | null = null;
 let recaptchaVerifier: RecaptchaVerifier | null = null;
 let activeConfirmationResult: ConfirmationResult | null = null;
 
 /**
- * Initialize Firebase Application
+ * Initialize Firebase Application Analytics
  */
-export function getFirebaseApp(): FirebaseApp {
-  if (typeof window !== 'undefined' && firebaseConfig.measurementId && appInstance) {
+export function initAnalytics() {
+  if (typeof window !== 'undefined' && clientConfig.measurementId && app) {
     isSupported().then((supported) => {
-      if (supported && appInstance) {
-        getAnalytics(appInstance);
+      if (supported && app) {
+        getAnalytics(app);
       }
     }).catch(() => {});
   }
-  return appInstance;
 }
 
 /**
- * Initialize Firebase Authentication
- */
-export function getFirebaseAuth(): Auth {
-  if (!authInstance) {
-    const app = getFirebaseApp();
-    authInstance = getAuth(app);
-    // Set language for SMS OTP (English / Hindi localized SMS)
-    authInstance.useDeviceLanguage();
-  }
-  return authInstance;
-}
-
-/**
- * Initialize Firebase App Check with ReCaptchaEnterpriseProvider or ReCaptchaV3Provider
- * Prevents unauthorized API / OTP abuse from bots and unauthorized origins
+ * Initialize Firebase App Check with ReCaptchaEnterpriseProvider
  */
 export function initAppCheck(): AppCheck | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === 'undefined' || !app || !isFirebaseConfigured) return null;
   if (appCheckInstance) return appCheckInstance;
 
   try {
-    const app = getFirebaseApp();
-
-    // Enable debug token in development environments
     if (import.meta.env.DEV) {
       // @ts-ignore
       self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
     }
 
-    if (firebaseConfig.reCaptchaSiteKey && !firebaseConfig.reCaptchaSiteKey.includes('fake')) {
+    if (clientConfig.reCaptchaSiteKey && !clientConfig.reCaptchaSiteKey.includes('fake')) {
       appCheckInstance = initializeAppCheck(app, {
-        provider: new ReCaptchaEnterpriseProvider(firebaseConfig.reCaptchaSiteKey),
+        provider: new ReCaptchaEnterpriseProvider(clientConfig.reCaptchaSiteKey),
         isTokenAutoRefreshEnabled: true,
       });
-      console.info('[AppCheck] Firebase App Check initialized successfully with ReCaptchaEnterpriseProvider');
+      console.info('[AppCheck] Firebase App Check initialized successfully');
     }
   } catch (err) {
-    console.error('[AppCheck] Failed to initialize Firebase App Check:', err);
+    console.warn('[AppCheck] Firebase App Check skipped:', err);
   }
 
   return appCheckInstance;
@@ -114,8 +92,9 @@ export function formatIndianPhoneNumber(phone: string): string {
 /**
  * Setup RecaptchaVerifier on a DOM element (or invisible)
  */
-export function setupRecaptchaVerifier(containerId: string): RecaptchaVerifier {
-  const auth = getFirebaseAuth();
+export function setupRecaptchaVerifier(containerId: string): RecaptchaVerifier | null {
+  const currentAuth = getFirebaseAuth();
+  if (!currentAuth) return null;
 
   // Clear existing verifier if any
   if (recaptchaVerifier) {
@@ -125,31 +104,46 @@ export function setupRecaptchaVerifier(containerId: string): RecaptchaVerifier {
     recaptchaVerifier = null;
   }
 
-  recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
-    size: 'invisible',
-    callback: () => {
-      console.info('[Recaptcha] Verification passed');
-    },
-    'expired-callback': () => {
-      console.warn('[Recaptcha] Verification expired. Please try again.');
-    },
-  });
+  // Clear existing inner HTML of container to prevent re-rendering issues
+  const container = document.getElementById(containerId);
+  if (container) {
+    container.innerHTML = '';
+  }
 
-  return recaptchaVerifier;
+  try {
+    recaptchaVerifier = new RecaptchaVerifier(currentAuth, containerId, {
+      size: 'invisible',
+      callback: () => {
+        console.info('[Recaptcha] Verification passed');
+      },
+      'expired-callback': () => {
+        console.warn('[Recaptcha] Verification expired. Please try again.');
+      },
+    });
+    return recaptchaVerifier;
+  } catch (err) {
+    console.warn('[Recaptcha] Could not initialize recaptcha verifier:', err);
+    return null;
+  }
 }
 
 /**
- * Send Phone OTP via Firebase Authentication
+ * Send Phone OTP via Firebase Authentication with graceful simulation fallback
  */
 export async function sendFirebasePhoneOtp(
   rawPhoneNumber: string,
   containerId: string = 'recaptcha-container'
-): Promise<ConfirmationResult> {
-  const auth = getFirebaseAuth();
+): Promise<ConfirmationResult | null> {
+  const currentAuth = getFirebaseAuth();
   const formattedPhone = formatIndianPhoneNumber(rawPhoneNumber);
 
   if (!/^\+91[6-9]\d{9}$/.test(formattedPhone)) {
     throw new Error('Please enter a valid 10-digit Indian mobile number (+91 6xxxx - 9xxxx)');
+  }
+
+  if (!currentAuth) {
+    // Return null to indicate client-side simulated OTP verification
+    return null;
   }
 
   // Ensure DOM container exists
@@ -161,12 +155,15 @@ export async function sendFirebasePhoneOtp(
   }
 
   const verifier = setupRecaptchaVerifier(containerId);
+  if (!verifier) {
+    return null;
+  }
+
   try {
-    const confirmation = await signInWithPhoneNumber(auth, formattedPhone, verifier);
+    const confirmation = await signInWithPhoneNumber(currentAuth, formattedPhone, verifier);
     activeConfirmationResult = confirmation;
     return confirmation;
   } catch (error: any) {
-    // Reset verifier on error
     if (verifier) {
       try {
         verifier.clear();
@@ -182,11 +179,11 @@ export async function sendFirebasePhoneOtp(
  */
 export async function verifyFirebaseOtp(
   otpCode: string,
-  confirmationResult?: ConfirmationResult
-): Promise<User> {
+  confirmationResult?: ConfirmationResult | null
+): Promise<User | null> {
   const confirmation = confirmationResult || activeConfirmationResult;
   if (!confirmation) {
-    throw new Error('No active OTP request found. Please request a new OTP.');
+    return null;
   }
 
   const result = await confirmation.confirm(otpCode);
@@ -197,8 +194,12 @@ export async function verifyFirebaseOtp(
  * Sign out user from Firebase and clear tokens
  */
 export async function logoutFirebaseUser(): Promise<void> {
-  const auth = getFirebaseAuth();
-  await firebaseSignOut(auth);
+  const currentAuth = getFirebaseAuth();
+  if (currentAuth) {
+    try {
+      await firebaseSignOut(currentAuth);
+    } catch (_) {}
+  }
   activeConfirmationResult = null;
 }
 
@@ -206,20 +207,28 @@ export async function logoutFirebaseUser(): Promise<void> {
  * Listen for user auth changes
  */
 export function subscribeToAuthChanges(callback: (user: User | null) => void): () => void {
-  const auth = getFirebaseAuth();
-  return onAuthStateChanged(auth, callback);
+  const currentAuth = getFirebaseAuth();
+  if (currentAuth) {
+    return onAuthStateChanged(currentAuth, callback);
+  }
+  callback(null);
+  return () => {};
 }
 
 /**
  * Sign in with Google Auth Provider via Firebase Popup
  */
 export async function signInWithGooglePopup(): Promise<User> {
-  const auth = getFirebaseAuth();
+  const currentAuth = getFirebaseAuth();
+  if (!currentAuth) {
+    throw new Error('Firebase Auth is not configured.');
+  }
+
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({
     prompt: 'select_account',
   });
 
-  const result = await signInWithPopup(auth, provider);
+  const result = await signInWithPopup(currentAuth, provider);
   return result.user;
 }

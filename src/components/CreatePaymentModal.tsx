@@ -372,7 +372,7 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
         </div>
 
         {/* Daily Free Limit Reached Guard (PRD Section 13 & 15) */}
-        {!isPro && (dailyUsage ? dailyUsage.used >= 4 : false) ? (
+        {!isPro && (dailyUsage ? dailyUsage.used >= 3 : false) ? (
           <div className="p-6 text-center space-y-4 my-auto">
             <div className="w-14 h-14 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center shadow-xs">
               <AlertTriangle className="w-7 h-7" />
@@ -382,7 +382,7 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
                 Daily Free Limit Reached
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-300 max-w-sm mx-auto leading-relaxed">
-                You've used all <strong>4 free QR payment requests for today</strong>.
+                You've used all <strong>3 free QR payment requests for today</strong>.
                 Your existing payment records and customer histories remain available.
               </p>
             </div>
@@ -423,7 +423,7 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
               {!isPro && (
                 <div className="p-2.5 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 rounded-xl text-xs flex items-center justify-between text-blue-900 dark:text-blue-200">
                   <span className="font-semibold">
-                    Free Plan: <strong>{dailyUsage ? dailyUsage.remaining : 4} of 4</strong> QR requests remaining today
+                    Free Plan: <strong>{dailyUsage ? dailyUsage.remaining : 3} of 3</strong> QR requests remaining today
                   </span>
                   {onOpenPricing && (
                     <button

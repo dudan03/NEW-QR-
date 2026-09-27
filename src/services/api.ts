@@ -117,13 +117,28 @@ export class ApiService {
    * Fetch today's QR payment session usage for Free plan (PRD Section 4 & 5)
    */
   static async getDailyUsage(userId: string): Promise<UsageSummary> {
-    const res = await fetch('/api/usage/today', {
-      headers: this.getHeaders(userId),
-    });
-    if (!res.ok) {
-      throw new Error('Failed to fetch daily usage');
+    const today = new Date().toISOString().slice(0, 10);
+    const defaultUsage: UsageSummary = {
+      used: 0,
+      limit: 3,
+      remaining: 3,
+      canCreate: true,
+      date: today,
+      isPro: false,
+      plan: 'FREE',
+    };
+
+    try {
+      const res = await fetch('/api/usage/today', {
+        headers: this.getHeaders(userId),
+      });
+      if (!res.ok) {
+        return defaultUsage;
+      }
+      return await res.json();
+    } catch {
+      return defaultUsage;
     }
-    return res.json();
   }
 
   /**
@@ -226,13 +241,31 @@ export class ApiService {
     plan: 'PRO' | 'FREE';
     payments: PaymentRecord[];
   }> {
-    const res = await fetch('/api/subscription', {
-      headers: this.getHeaders(userId),
-    });
-    if (!res.ok) {
-      throw new Error('Failed to fetch subscription');
+    try {
+      const res = await fetch('/api/subscription', {
+        headers: this.getHeaders(userId),
+      });
+      if (!res.ok) {
+        return {
+          subscription: null,
+          isPro: false,
+          isExpired: false,
+          daysRemaining: 0,
+          plan: 'FREE',
+          payments: [],
+        };
+      }
+      return await res.json();
+    } catch {
+      return {
+        subscription: null,
+        isPro: false,
+        isExpired: false,
+        daysRemaining: 0,
+        plan: 'FREE',
+        payments: [],
+      };
     }
-    return res.json();
   }
 
   /**
@@ -278,6 +311,7 @@ export class ApiService {
       orderId: string;
       providerPaymentId: string;
       signature?: string;
+      razorpayOrderId?: string;
       timestamp?: string;
     }
   ): Promise<{

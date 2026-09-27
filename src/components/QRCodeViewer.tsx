@@ -1,18 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode';
-import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { Installment, PaymentSession, SupportedLanguage } from '../types';
 import { formatPaise } from '../utils/currency';
 import { translations } from '../locales';
 import {
-  Share2,
-  Download,
   Copy,
   Check,
-  ExternalLink,
   ShieldCheck,
-  AlertCircle,
   Clock,
   CheckCircle2,
 } from 'lucide-react';
@@ -39,8 +34,6 @@ export const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
   const t = translations[language];
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [copiedUpi, setCopiedUpi] = useState(false);
-  const [copiedUri, setCopiedUri] = useState(false);
-  const [qrDataUrl, setQrDataUrl] = useState<string>('');
 
   useEffect(() => {
     if (canvasRef.current && installment.paymentUri) {
@@ -58,9 +51,6 @@ export const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
         },
         (error) => {
           if (error) console.error('QR code generation error', error);
-          if (canvasRef.current) {
-            setQrDataUrl(canvasRef.current.toDataURL('image/png'));
-          }
         }
       );
     }
@@ -74,47 +64,6 @@ export const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
     } catch {
       // fallback
     }
-  };
-
-  const handleCopyUri = async () => {
-    try {
-      await navigator.clipboard.writeText(installment.paymentUri);
-      setCopiedUri(true);
-      setTimeout(() => setCopiedUri(false), 2000);
-    } catch {
-      // fallback
-    }
-  };
-
-  const handleDownloadQr = () => {
-    if (!qrDataUrl) return;
-    const a = document.createElement('a');
-    a.href = qrDataUrl;
-    a.download = `UPI-QR-${session.id}-Part${installment.sequence}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
-  const handleShareQr = async () => {
-    const textMsg = `UPI Payment Request: ${formatPaise(installment.amountPaise)} (Installment ${installment.sequence}/${totalInstallments})\nPayee: ${session.payeeName || 'Merchant'}\nUPI ID: ${session.upiId}\nLink: ${installment.paymentUri}`;
-    
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `UPI Payment - ${formatPaise(installment.amountPaise)}`,
-          text: textMsg,
-        });
-      } catch {
-        // User cancelled or unsupported
-      }
-    } else {
-      handleCopyUri();
-    }
-  };
-
-  const handleOpenUpiApp = () => {
-    window.location.href = installment.paymentUri;
   };
 
   const isConfirmed =
@@ -149,48 +98,37 @@ export const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
         </div>
       </div>
 
-      {/* Animated QR Code Presentation */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={installment.id}
-          initial={{ opacity: 0, scale: 0.94, y: 12 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.94, y: -12 }}
-          transition={{
-            type: 'spring',
-            stiffness: 340,
-            damping: 28,
-            mass: 0.8,
-          }}
-          className="w-full flex flex-col items-center"
-        >
-          {/* Amount Display */}
-          <div className="text-center py-3">
-            <div className="text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
-              {formatPaise(installment.amountPaise)}
-            </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center justify-center gap-1">
-              <span>{session.customerName || 'Customer'}</span>
-              {session.invoiceId && (
-                <>
-                  <span>·</span>
-                  <span>{session.invoiceId}</span>
-                </>
-              )}
-            </div>
+      {/* Static QR Code Presentation */}
+      <div
+        key={installment.id}
+        className="w-full flex flex-col items-center"
+      >
+        {/* Amount Display */}
+        <div className="text-center py-3">
+          <div className="text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
+            {formatPaise(installment.amountPaise)}
           </div>
+          <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center justify-center gap-1">
+            <span>{session.customerName || 'Customer'}</span>
+            {session.invoiceId && (
+              <>
+                <span>·</span>
+                <span>{session.invoiceId}</span>
+              </>
+            )}
+          </div>
+        </div>
 
-          {/* QR Code Container */}
-          <div className="relative flex flex-col items-center justify-center p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800 my-2 w-full max-w-[280px]">
-            <div className="bg-white p-3 rounded-xl shadow-xs ring-1 ring-slate-900/5 transition-all">
-              <canvas ref={canvasRef} className="max-w-[200px] max-h-[200px] w-full h-auto block" />
-            </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 text-center">
-              Scan with any UPI app (GPay, PhonePe, Paytm, BHIM, Bank UPI)
-            </p>
+        {/* QR Code Container */}
+        <div className="relative flex flex-col items-center justify-center p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800 my-2 w-full max-w-[280px]">
+          <div className="bg-white p-3 rounded-xl shadow-xs ring-1 ring-slate-900/5 transition-all">
+            <canvas ref={canvasRef} className="max-w-[200px] max-h-[200px] w-full h-auto block" />
           </div>
-        </motion.div>
-      </AnimatePresence>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 text-center">
+            Scan with any UPI app (GPay, PhonePe, Paytm, BHIM, Bank UPI)
+          </p>
+        </div>
+      </div>
 
       {/* Payee UPI ID row with copy */}
       <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/80 px-3 py-2 rounded-lg text-xs mt-3">
@@ -203,7 +141,7 @@ export const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
         <button
           type="button"
           onClick={handleCopyUpi}
-          className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md text-slate-600 dark:text-slate-300 transition-colors shrink-0"
+          className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md text-slate-600 dark:text-slate-300 transition-colors shrink-0 cursor-pointer"
           title="Copy UPI ID"
         >
           {copiedUpi ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
@@ -219,8 +157,8 @@ export const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
         </div>
       </div>
 
-      {/* Primary Actions */}
-      <div className="space-y-2 mt-4">
+      {/* Primary Action Button */}
+      <div className="mt-4">
         {!isConfirmed ? (
           <button
             type="button"
@@ -235,7 +173,7 @@ export const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
               } catch {}
               onMarkReceived(installment);
             }}
-            className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
+            className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
           >
             <Check className="w-4 h-4" />
             {t.actions.markAsReceived}
@@ -246,37 +184,6 @@ export const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
             {t.states.MANUALLY_CONFIRMED}
           </div>
         )}
-
-        {/* Secondary Action Bar */}
-        <div className="grid grid-cols-3 gap-2">
-          <button
-            type="button"
-            onClick={handleShareQr}
-            className="h-10 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium rounded-xl flex items-center justify-center gap-1.5 transition-colors"
-          >
-            <Share2 className="w-3.5 h-3.5" />
-            {t.actions.shareQr}
-          </button>
-
-          <button
-            type="button"
-            onClick={handleDownloadQr}
-            className="h-10 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium rounded-xl flex items-center justify-center gap-1.5 transition-colors"
-          >
-            <Download className="w-3.5 h-3.5" />
-            {t.actions.saveQr}
-          </button>
-
-          <button
-            type="button"
-            onClick={handleOpenUpiApp}
-            className="h-10 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium rounded-xl flex items-center justify-center gap-1.5 transition-colors"
-            title="Open in UPI App on this device"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            {t.actions.openUpiApp}
-          </button>
-        </div>
       </div>
 
       {/* Installment Switcher Carousel / Pagination */}
@@ -291,7 +198,7 @@ export const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
                 key={inst.id}
                 type="button"
                 onClick={() => onSelectInstallment(idx)}
-                className={`min-w-[32px] h-7 px-2 rounded-lg text-xs font-medium transition-all ${
+                className={`min-w-[32px] h-7 px-2 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                   isCurrent
                     ? 'bg-blue-600 text-white font-semibold shadow-xs'
                     : instConfirmed
