@@ -5,6 +5,10 @@ import {
   PaymentSession,
   AuditEvent,
   BackupExportData,
+  Subscription,
+  PaymentRecord,
+  UsageSummary,
+  AICategorizationResult,
 } from '../types';
 
 export class ApiService {
@@ -96,6 +100,7 @@ export class ApiService {
     sessions: PaymentSession[];
     auditEvents: AuditEvent[];
     business: BusinessProfile | null;
+    usage?: UsageSummary;
   }> {
     const res = await fetch('/api/sync', {
       method: 'POST',
@@ -104,6 +109,41 @@ export class ApiService {
     });
     if (!res.ok) {
       throw new Error(`Sync request failed with code ${res.status}`);
+    }
+    return res.json();
+  }
+
+  /**
+   * Fetch today's QR payment session usage for Free plan (PRD Section 4 & 5)
+   */
+  static async getDailyUsage(userId: string): Promise<UsageSummary> {
+    const res = await fetch('/api/usage/today', {
+      headers: this.getHeaders(userId),
+    });
+    if (!res.ok) {
+      throw new Error('Failed to fetch daily usage');
+    }
+    return res.json();
+  }
+
+  /**
+   * Create a new payment session on the server with atomic daily usage enforcement
+   */
+  static async createPaymentSession(
+    userId: string,
+    session: PaymentSession
+  ): Promise<{ session: PaymentSession; usage?: UsageSummary }> {
+    const res = await fetch('/api/sessions', {
+      method: 'POST',
+      headers: this.getHeaders(userId),
+      body: JSON.stringify(session),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'FAILED_TO_CREATE' }));
+      const errorObj = new Error(err.message || 'Failed to create payment session') as any;
+      errorObj.code = err.error;
+      errorObj.usage = err.usage;
+      throw errorObj;
     }
     return res.json();
   }
@@ -171,6 +211,119 @@ export class ApiService {
     });
     if (!res.ok) {
       throw new Error('Confirmation sync failed');
+    }
+    return res.json();
+  }
+
+  /**
+   * Fetch current subscription and payment history (PRD Section 12 & 15)
+   */
+  static async getSubscription(userId: string): Promise<{
+    subscription: Subscription | null;
+    isPro: boolean;
+    isExpired: boolean;
+    daysRemaining: number;
+    plan: 'PRO' | 'FREE';
+    payments: PaymentRecord[];
+  }> {
+    const res = await fetch('/api/subscription', {
+      headers: this.getHeaders(userId),
+    });
+    if (!res.ok) {
+      throw new Error('Failed to fetch subscription');
+    }
+    return res.json();
+  }
+
+  /**
+   * Initiate subscription checkout order (PRD Section 5 & 6)
+   */
+  static async createSubscriptionCheckout(
+    userId: string,
+    customerData: {
+      firstName: string;
+      lastName?: string;
+      email: string;
+      phone?: string;
+    }
+  ): Promise<{
+    orderId: string;
+    amountPaise: number;
+    amountRupees: number;
+    currency: string;
+    plan: string;
+    durationMonths: number;
+    customer: { name: string; email: string; phone?: string };
+    checkoutToken: string;
+    timestamp: string;
+  }> {
+    const res = await fetch('/api/subscription/checkout', {
+      method: 'POST',
+      headers: this.getHeaders(userId),
+      body: JSON.stringify(customerData),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Checkout initiation failed' }));
+      throw new Error(err.error || 'Failed to initiate checkout');
+    }
+    return res.json();
+  }
+
+  /**
+   * Verify subscription payment cryptographically and activate Pro (PRD Section 5, 8, 10)
+   */
+  static async verifySubscriptionPayment(
+    userId: string,
+    verificationData: {
+      orderId: string;
+      providerPaymentId: string;
+      signature?: string;
+      timestamp?: string;
+    }
+  ): Promise<{
+    success: boolean;
+    alreadyProcessed?: boolean;
+    message: string;
+    subscription: Subscription;
+    payment: PaymentRecord;
+  }> {
+    const res = await fetch('/api/subscription/verify', {
+      method: 'POST',
+      headers: this.getHeaders(userId),
+      body: JSON.stringify(verificationData),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Payment verification failed' }));
+      throw new Error(err.error || 'Payment verification failed');
+    }
+    return res.json();
+  }
+
+  /**
+   * Auto-categorize session and suggest tags using Gemini 3.8 Flash
+   */
+  static async categorizeSession(
+    userId: string,
+    data: {
+      title?: string;
+      notes?: string;
+      customerName?: string;
+      amountPaise?: number;
+    }
+  ): Promise<AICategorizationResult> {
+    const res = await fetch('/api/ai/categorize', {
+      method: 'POST',
+      headers: this.getHeaders(userId),
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      // Fallback
+      return {
+        suggestedCategory: 'Retail',
+        suggestedTags: ['Retail', 'Service', 'Freelance'],
+        confidence: 'low',
+        reason: 'Default tags',
+      };
     }
     return res.json();
   }

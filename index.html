@@ -2,20 +2,100 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <style>
+      vite-error-overlay {
+        display: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+      }
+    </style>
+    <script>
+      (function() {
+        function isWsError(err) {
+          if (!err) return false;
+          var str = (err.message || err.reason || String(err) || '').toLowerCase();
+          return (
+            str.indexOf('websocket') !== -1 ||
+            str.indexOf('[vite]') !== -1 ||
+            str.indexOf('closed without opened') !== -1 ||
+            str.indexOf('failed to connect to websocket') !== -1
+          );
+        }
+
+        // Suppress console WebSocket / Vite HMR logs in environment
+        var origConsoleError = console.error;
+        console.error = function() {
+          var args = Array.prototype.slice.call(arguments);
+          var joined = args.map(function(a) { return String(a || ''); }).join(' ').toLowerCase();
+          if (isWsError({ message: joined })) {
+            return;
+          }
+          return origConsoleError.apply(console, arguments);
+        };
+
+        var origConsoleWarn = console.warn;
+        console.warn = function() {
+          var args = Array.prototype.slice.call(arguments);
+          var joined = args.map(function(a) { return String(a || ''); }).join(' ').toLowerCase();
+          if (isWsError({ message: joined })) {
+            return;
+          }
+          return origConsoleWarn.apply(console, arguments);
+        };
+
+        window.addEventListener('unhandledrejection', function(e) {
+          if (isWsError(e.reason)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            var ov = document.querySelectorAll('vite-error-overlay');
+            ov.forEach(function(el) { el.remove(); });
+          }
+        }, true);
+
+        window.addEventListener('error', function(e) {
+          if (isWsError(e.error) || isWsError(e.message)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            var ov = document.querySelectorAll('vite-error-overlay');
+            ov.forEach(function(el) { el.remove(); });
+          }
+        }, true);
+
+        // Continuous observer to clean up any overlay if dynamically injected
+        if (typeof MutationObserver !== 'undefined') {
+          var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+              mutation.addedNodes.forEach(function(node) {
+                if (node.nodeName && node.nodeName.toLowerCase() === 'vite-error-overlay') {
+                  node.remove();
+                }
+              });
+            });
+          });
+          document.addEventListener('DOMContentLoaded', function() {
+            observer.observe(document.documentElement, { childList: true, subtree: true });
+          });
+          if (document.documentElement) {
+            observer.observe(document.documentElement, { childList: true, subtree: true });
+          }
+        }
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Repair Khata</title>
-    <meta name="description" content="Clean, fast, professional repair shop management and customer khata ledger system for Indian businesses." />
+    <title>Split UPI QR — Split. Scan. Track.</title>
+    <meta name="description" content="Split UPI QR: Split. Scan. Track. Free Plan with 4 QR payment requests/day and ₹999 Pro subscription for unlimited UPI installments and merchant records." />
     <meta name="theme-color" content="#2563EB" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Repair Khata" />
+    <meta name="apple-mobile-web-app-title" content="Split UPI QR" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png" />
     <link rel="manifest" href="/manifest.json" />
-    <meta property="og:title" content="Repair Khata" />
-    <meta property="og:description" content="Clean, fast, professional repair shop management and customer khata ledger system for Indian businesses." />
+    <meta property="og:title" content="Split UPI QR — Split. Scan. Track." />
+    <meta property="og:description" content="Split UPI QR: Split. Scan. Track. Free Plan with 4 QR payment requests/day and ₹999 Pro subscription for unlimited UPI installments and merchant records." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />

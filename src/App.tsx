@@ -16,6 +16,8 @@ import {
   UserAccount,
   SyncStatusState,
   InAppAlert,
+  Subscription,
+  UsageSummary,
 } from './types';
 import { StorageService } from './services/storage';
 import { ApiService } from './services/api';
@@ -28,6 +30,7 @@ import { HistoryScreen } from './screens/HistoryScreen';
 import { CustomersScreen } from './screens/CustomersScreen';
 import { ReportsScreen } from './screens/ReportsScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
+import { SubscriptionScreen } from './screens/SubscriptionScreen';
 import { LandingPage } from './components/LandingPage';
 import { CreatePaymentModal } from './components/CreatePaymentModal';
 import { ManualConfirmModal } from './components/ManualConfirmModal';
@@ -41,6 +44,10 @@ import { LegalModal } from './components/LegalModal';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { NotificationToastBanner } from './components/NotificationToastBanner';
 import { NotificationCenterModal } from './components/NotificationCenterModal';
+import { SecurityArchitectureModal } from './components/SecurityArchitectureModal';
+import { useInactivityTimeout } from './hooks/useInactivityTimeout';
+import { logoutFirebaseUser } from './services/firebaseAuth';
+import { Lock, ShieldAlert } from 'lucide-react';
 
 export default function App() {
   // Core application state
@@ -56,6 +63,22 @@ export default function App() {
   // Navigation & Screen states
   const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [showLanding, setShowLanding] = useState<boolean>(false);
+  const [showPricing, setShowPricing] = useState<boolean>(() => {
+    return (
+      typeof window !== 'undefined' &&
+      (window.location.pathname === '/pricing' ||
+        window.location.pathname === '/subscription' ||
+        window.location.search.includes('pricing') ||
+        window.location.search.includes('subscription'))
+    );
+  });
+  const [subscription, setSubscription] = useState<Subscription | null>(() =>
+    StorageService.getSubscription()
+  );
+  const [isPro, setIsPro] = useState<boolean>(() => StorageService.isPro());
+  const [dailyUsage, setDailyUsage] = useState<UsageSummary | null>(() =>
+    StorageService.getDailyUsage()
+  );
 
   // Interactive Modals
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -67,6 +90,8 @@ export default function App() {
   const [isWelcomeBackOpen, setIsWelcomeBackOpen] = useState(false);
   const [isDeleteAccountOpen, setIsDeleteAccountOpen] = useState(false);
   const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
+  const [isSecurityOpen, setIsSecurityOpen] = useState(false);
+  const [securityToast, setSecurityToast] = useState<string | null>(null);
   const [legalTab, setLegalTab] = useState<'privacy' | 'terms' | 'data' | null>(null);
 
   // Notification Scheduling & Alerts
@@ -98,18 +123,58 @@ export default function App() {
     setUser(StorageService.getUser());
     setSyncStatus(StorageService.getSyncStatus());
     setLastSyncTime(StorageService.getLastSyncTime());
+    setSubscription(StorageService.getSubscription());
+    setIsPro(StorageService.isPro());
+    setDailyUsage(StorageService.getDailyUsage());
+  }, []);
+
+  // Fetch verified subscription status from server (PRD Section 12 & 15)
+  const refreshSubscription = useCallback(async (userId?: string) => {
+    const targetUserId = userId || StorageService.getUser()?.id;
+    if (!targetUserId) {
+      setSubscription(null);
+      setIsPro(false);
+      return;
+    }
+    try {
+      const res = await ApiService.getSubscription(targetUserId);
+      setSubscription(res.subscription);
+      setIsPro(res.isPro);
+      if (res.subscription) {
+        StorageService.saveSubscription(res.subscription);
+      }
+    } catch {
+      setSubscription(StorageService.getSubscription());
+      setIsPro(StorageService.isPro());
+    }
+  }, []);
+
+  // Fetch verified daily usage for Free plan from server (PRD Section 4 & 5)
+  const refreshDailyUsage = useCallback(async (userId?: string) => {
+    const targetUserId = userId || StorageService.getUser()?.id || 'default-merchant';
+    try {
+      const usage = await ApiService.getDailyUsage(targetUserId);
+      setDailyUsage(usage);
+      StorageService.saveDailyUsage(usage);
+    } catch {
+      setDailyUsage(StorageService.getDailyUsage());
+    }
   }, []);
 
   // Trigger synchronization
   const triggerSync = useCallback(async () => {
     const result = await StorageService.performSync();
     refreshAllData();
+    refreshSubscription();
+    refreshDailyUsage();
     return result;
-  }, [refreshAllData]);
+  }, [refreshAllData, refreshSubscription, refreshDailyUsage]);
 
   // Initial load
   useEffect(() => {
     refreshAllData();
+    refreshSubscription();
+    refreshDailyUsage();
 
     // Check onboarding requirement
     const loadedSettings = StorageService.getSettings();
@@ -122,19 +187,34 @@ export default function App() {
     if (navigator.onLine) {
       StorageService.performSync().then(() => {
         refreshAllData();
+        refreshSubscription();
+        refreshDailyUsage();
       });
     }
 
-    // Listen for online events
+    // Listen for online events & route changes
     const handleOnline = () => {
       StorageService.performSync().then(() => {
         refreshAllData();
+        refreshSubscription();
+        refreshDailyUsage();
       });
     };
 
+    const handlePopState = () => {
+      setShowPricing(
+        window.location.pathname === '/pricing' ||
+          window.location.pathname === '/subscription'
+      );
+    };
+
     window.addEventListener('online', handleOnline);
-    return () => window.removeEventListener('online', handleOnline);
-  }, [refreshAllData]);
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [refreshAllData, refreshSubscription]);
 
   // Sync dark theme with HTML root class
   useEffect(() => {
@@ -275,8 +355,39 @@ export default function App() {
     triggerSync();
   };
 
-  // Handler: Create New Payment Session
-  const handleCreateSession = (newSession: PaymentSession, customerRef?: Customer) => {
+  // Handler: Create New Payment Session (PRD Section 8, 9, 10, 16, 18)
+  const handleCreateSession = async (newSession: PaymentSession, customerRef?: Customer) => {
+    const targetUserId = user?.id || 'default-merchant';
+
+    // Quick client-side check if user reached 4/4 free QR requests
+    if (!isPro && dailyUsage && dailyUsage.used >= 4) {
+      setIsCreateOpen(false);
+      setShowPricing(true);
+      window.history.pushState({}, '', '/subscription');
+      return;
+    }
+
+    try {
+      // Create session on server with atomic daily usage check & increment
+      const res = await ApiService.createPaymentSession(targetUserId, newSession);
+      if (res.usage) {
+        setDailyUsage(res.usage);
+        StorageService.saveDailyUsage(res.usage);
+      }
+    } catch (err: any) {
+      if (err.code === 'FREE_DAILY_LIMIT_REACHED' || err.status === 429) {
+        if (err.usage) {
+          setDailyUsage(err.usage);
+          StorageService.saveDailyUsage(err.usage);
+        }
+        setIsCreateOpen(false);
+        setShowPricing(true);
+        window.history.pushState({}, '', '/subscription');
+        return;
+      }
+      console.warn('Server sync error during session creation, fallback to local:', err);
+    }
+
     if (customerRef) {
       StorageService.saveCustomer(customerRef);
     }
@@ -288,6 +399,7 @@ export default function App() {
     });
 
     refreshAllData();
+    refreshDailyUsage(targetUserId);
     setIsCreateOpen(false);
     setInitialCustomerForPayment(null);
     setSelectedSession(newSession);
@@ -386,6 +498,9 @@ export default function App() {
     setUser(authUser);
     setIsAuthOpen(false);
 
+    // Hydrate multi-device subscription status (PRD Section 15)
+    await refreshSubscription(authUser.id);
+
     // Check if cloud backup has records to offer restoration
     try {
       const backupRes = await ApiService.fetchCloudBackup(authUser.id);
@@ -422,11 +537,30 @@ export default function App() {
     setIsWelcomeBackOpen(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
+    logoutFirebaseUser().catch(() => {});
     StorageService.clearUser();
     setUser(null);
     refreshAllData();
-  };
+  }, [refreshAllData]);
+
+  // 15-Minute Session Inactivity Security Manager
+  const { isWarningActive, secondsLeft, resetTimer } = useInactivityTimeout({
+    timeoutMs: 15 * 60 * 1000, // 15 minutes
+    warningMs: 60 * 1000,       // 60-second warning countdown
+    enabled: !!user,
+    onTimeout: () => {
+      handleLogout();
+      setSecurityToast(
+        'Session automatically locked after 15 minutes of inactivity to protect your financial and customer data.'
+      );
+      StorageService.recordAuditEvent({
+        sessionId: selectedSession?.id || 'AUTH_SESSION',
+        newState: 'PENDING',
+        note: 'Automatic security session termination due to 15-minute inactivity policy.',
+      });
+    },
+  });
 
   const handleDeleteAccountSuccess = () => {
     StorageService.clearAllData();
@@ -486,6 +620,32 @@ export default function App() {
     );
   }
 
+  // If user navigated to Dedicated Pro Subscription & Pricing view (PRD Section 3)
+  if (showPricing) {
+    return (
+      <SubscriptionScreen
+        user={user}
+        language={settings.language}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        dailyUsage={dailyUsage}
+        onClose={() => {
+          setShowPricing(false);
+          if (
+            window.location.pathname === '/pricing' ||
+            window.location.pathname === '/subscription'
+          ) {
+            window.history.pushState({}, '', '/');
+          }
+        }}
+        onSubscriptionUpdated={() => {
+          refreshAllData();
+          refreshSubscription();
+          refreshDailyUsage();
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors">
       {/* Offline Alert Banner */}
@@ -510,7 +670,50 @@ export default function App() {
         onOpenLanding={() => setShowLanding(true)}
         notificationCount={activeAlerts.length}
         onOpenNotifications={() => setIsNotificationCenterOpen(true)}
+        onOpenSecurity={() => setIsSecurityOpen(true)}
+        isPro={isPro}
+        dailyUsage={dailyUsage}
+        onOpenPricing={() => {
+          setShowPricing(true);
+          window.history.pushState({}, '', '/subscription');
+        }}
       />
+
+      {/* 15-Minute Inactivity Warning Countdown Banner */}
+      {isWarningActive && user && (
+        <div className="bg-amber-500 text-white px-4 py-2 text-xs font-semibold flex items-center justify-between shadow-md sticky top-14 z-30 animate-pulse">
+          <div className="flex items-center gap-2">
+            <Lock className="w-4 h-4 shrink-0" />
+            <span>
+              Security Notice: Idle for 14 minutes. Session will auto-lock in <strong>{secondsLeft}s</strong> to protect financial records.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={resetTimer}
+            className="px-2.5 py-1 bg-white text-amber-800 rounded-lg font-bold text-xs hover:bg-amber-50 transition cursor-pointer shadow-xs"
+          >
+            Stay Logged In
+          </button>
+        </div>
+      )}
+
+      {/* Security Auto-Logout Toast Notification */}
+      {securityToast && (
+        <div className="bg-slate-900 text-white px-4 py-2.5 text-xs font-medium flex items-center justify-between shadow-lg sticky top-14 z-30 border-b border-slate-700 animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>{securityToast}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSecurityToast(null)}
+            className="text-slate-400 hover:text-white px-2 py-0.5 rounded text-xs font-bold"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Floating In-App Due Date Notification Alert Banner */}
       <NotificationToastBanner
@@ -543,6 +746,13 @@ export default function App() {
             onOpenReports={() => setActiveTab('reports')}
             hasDemoSession={hasDemoSession}
             analytics={analytics}
+            isPro={isPro}
+            subscription={subscription}
+            dailyUsage={dailyUsage}
+            onOpenPricing={() => {
+              setShowPricing(true);
+              window.history.pushState({}, '', '/subscription');
+            }}
           />
         )}
 
@@ -626,6 +836,13 @@ export default function App() {
             onClearAllData={handleClearAllData}
             onOpenOnboarding={() => setIsOnboardingOpen(true)}
             onRestoreBackup={handleRestoreBackupJson}
+            onOpenSecurity={() => setIsSecurityOpen(true)}
+            isPro={isPro}
+            subscription={subscription}
+            onOpenPricing={() => {
+              setShowPricing(true);
+              window.history.pushState({}, '', '/subscription');
+            }}
           />
         )}
       </main>
@@ -646,6 +863,13 @@ export default function App() {
         customers={customers}
         initialCustomer={initialCustomerForPayment}
         sessionCount={sessions.length}
+        isPro={isPro}
+        dailyUsage={dailyUsage}
+        onOpenPricing={() => {
+          setIsCreateOpen(false);
+          setShowPricing(true);
+          window.history.pushState({}, '', '/subscription');
+        }}
         onClose={() => {
           setIsCreateOpen(false);
           setInitialCustomerForPayment(null);
@@ -767,6 +991,20 @@ export default function App() {
         }}
         hasPushPermission={hasPushPermission}
         onRequestPushPermission={handleRequestPushPermission}
+      />
+
+      {/* Enterprise Security Architecture & Cloudflare Console Modal */}
+      <SecurityArchitectureModal
+        isOpen={isSecurityOpen}
+        onClose={() => setIsSecurityOpen(false)}
+        secondsRemaining={secondsLeft}
+        onTestTimeout={() => {
+          setIsSecurityOpen(false);
+          handleLogout();
+          setSecurityToast(
+            'Security Simulation: Session was automatically locked due to 15-minute inactivity policy.'
+          );
+        }}
       />
     </div>
   );

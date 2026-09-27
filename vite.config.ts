@@ -24,8 +24,10 @@ export default defineConfig(() => {
           cleanupOutdatedCaches: true,
           clientsClaim: true,
           skipWaiting: true,
+          dontCacheBustURLsMatching: /\.[0-9a-f]{8}\./,
           navigateFallback: '/index.html',
-          navigateFallbackDenylist: [/^\/api\/.*/, /\.[a-zA-Z0-9]+$/],
+          navigateFallbackAllowlist: [/^(?!\/__).*/],
+          navigateFallbackDenylist: [/^\/api\/.*/, /^\/__/],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -55,13 +57,30 @@ export default defineConfig(() => {
                 },
               },
             },
+            {
+              urlPattern: /^https:\/\/images\.unsplash\.com\/.*/i,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'unsplash-images-cache',
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
           ],
+        },
+        devOptions: {
+          enabled: false,
         },
         manifest: {
           id: '/',
-          name: 'Repair Khata',
-          short_name: 'RepairKhata',
-          description: 'Clean, fast, professional repair shop management and customer khata ledger system for Indian businesses.',
+          name: 'Split UPI QR',
+          short_name: 'SplitUPIQR',
+          description: 'Split, scan, and track UPI installment payments with accurate paise-based QR generation and merchant payment recording.',
           theme_color: '#2563EB',
           background_color: '#F8FAFC',
           display: 'standalone',
@@ -99,11 +118,10 @@ export default defineConfig(() => {
       chunkSizeWarningLimit: 1500,
     },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modify—file watching is disabled to prevent flickering during agent edits.
-      hmr: process.env.DISABLE_HMR !== 'true',
-      // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
-      watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      // HMR is disabled in AI Studio environment
+      hmr: false,
+      // Disable file watching to save CPU during edits
+      watch: null,
     },
   };
 });

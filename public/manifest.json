@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Repair Khata",
-  "short_name": "RepairKhata",
-  "description": "Clean, fast, professional repair shop management and customer khata ledger system for Indian businesses.",
+  "name": "Split UPI QR",
+  "short_name": "SplitUPIQR",
+  "description": "Split, scan, and track UPI installment payments with accurate paise-based QR generation and merchant payment recording.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -44,7 +44,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
             <div>
               <h1 className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white leading-none">
-                QR SplitPay India
+                Split UPI QR
               </h1>
               <p className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 mt-0.5">
                 {t.tagline}
@@ -156,7 +156,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="w-3 h-3 rounded-full bg-red-400" />
                 <div className="w-3 h-3 rounded-full bg-amber-400" />
                 <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                <span className="text-xs font-mono text-slate-400 ml-2">QR SplitPay Live Dashboard</span>
+                <span className="text-xs font-mono text-slate-400 ml-2">Split UPI QR Live Dashboard</span>
               </div>
               <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
                 Cloud Synced
@@ -456,7 +456,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div>
             <p className="font-bold text-slate-800 dark:text-slate-200">
-              QR SplitPay India • v2.0
+              Split UPI QR • v2.0
             </p>
             <p className="text-[11px] mt-0.5">
               Split. Scan. Pay. Track. Designed for Indian merchant installment management.

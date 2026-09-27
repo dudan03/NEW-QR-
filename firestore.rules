@@ -1,0 +1,95 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global helper functions
+    function isAuthenticated() {
+      return request.auth != null && request.auth.uid != null;
+    }
+
+    function isOwner(merchantId) {
+      return isAuthenticated() && request.auth.uid == merchantId;
+    }
+
+    function isPhoneVerified() {
+      return isAuthenticated() && (
+        request.auth.token.firebase.sign_in_provider == 'phone' ||
+        request.auth.token.firebase.sign_in_provider == 'google.com'
+      );
+    }
+
+    function isValidTimestamp(ts) {
+      return ts is timestamp || ts is string;
+    }
+
+    // Default deny all unknown collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 1. Merchant Root Document
+    match /merchants/{merchantId} {
+      allow read: if isOwner(merchantId);
+      allow create: if isOwner(merchantId) 
+        && request.resource.data.keys().hasAll(['phone', 'businessName', 'createdAt'])
+        && request.resource.data.phone is string;
+      allow update: if isOwner(merchantId)
+        && request.resource.data.merchantId == merchantId;
+      allow delete: if isOwner(merchantId);
+
+      // 2. Customer CRM Subcollection
+      match /customers/{customerId} {
+        allow read: if isOwner(merchantId);
+        allow create: if isOwner(merchantId)
+          && request.resource.data.keys().hasAll(['name', 'phone', 'totalPurchasesPaise', 'outstandingPaise'])
+          && request.resource.data.phone is string
+          && request.resource.data.totalPurchasesPaise is int
+          && request.resource.data.outstandingPaise is int;
+        allow update: if isOwner(merchantId)
+          && request.resource.data.totalPurchasesPaise >= 0
+          && request.resource.data.outstandingPaise >= 0;
+        allow delete: if isOwner(merchantId);
+      }
+
+      // 3. Payment Sessions & Split Installments Subcollection
+      match /sessions/{sessionId} {
+        allow read: if isOwner(merchantId);
+        allow create: if isOwner(merchantId)
+          && request.resource.data.totalAmountPaise is int
+          && request.resource.data.totalAmountPaise > 0
+          && request.resource.data.installmentCount is int
+          && request.resource.data.installmentCount >= 1
+          && request.resource.data.installmentCount <= 24;
+        allow update: if isOwner(merchantId)
+          && request.resource.data.totalAmountPaise == resource.data.totalAmountPaise; // Total amount cannot be modified after creation
+        allow delete: if isOwner(merchantId);
+      }
+
+      // 4. Individual Installment Records
+      match /installments/{installmentId} {
+        allow read: if isOwner(merchantId);
+        allow create, update: if isOwner(merchantId)
+          && request.resource.data.amountPaise is int
+          && request.resource.data.amountPaise > 0;
+        allow delete: if isOwner(merchantId);
+      }
+
+      // 5. Append-only Audit Trail (Financial compliance)
+      // Merchants can read and create, but NEVER update or delete audit logs!
+      match /auditLogs/{logId} {
+        allow read: if isOwner(merchantId);
+        allow create: if isOwner(merchantId)
+          && request.resource.data.keys().hasAll(['action', 'timestamp', 'actorId']);
+        allow update, delete: if false; // Immutable audit log
+      }
+    }
+
+    // 6. Public QR Receipt Verification (Read-Only)
+    // Allows customers to verify invoice authenticity via QR code scan
+    // Only backend Cloud Functions using Admin SDK can write here.
+    match /publicReceipts/{receiptId} {
+      allow read: if true;
+      allow write: if false; // strictly server-authoritative
+    }
+  }
+}

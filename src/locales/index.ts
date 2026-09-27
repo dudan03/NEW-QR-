@@ -242,7 +242,7 @@ export interface Translations {
 
 export const translations: Record<SupportedLanguage, Translations> = {
   en: {
-    appName: 'QR SplitPay India',
+    appName: 'Split UPI QR',
     tagline: 'Split. Scan. Pay. Track.',
     subtitle: 'Split, scan and track UPI installments with cloud sync.',
     nav: {
@@ -479,7 +479,7 @@ export const translations: Record<SupportedLanguage, Translations> = {
   },
 
   hi: {
-    appName: 'QR SplitPay India',
+    appName: 'Split UPI QR',
     tagline: 'विभाजित करें. स्कैन करें. भुगतान करें. ट्रैक करें.',
     subtitle: 'क्लाउड सिंक के साथ यूपीआई किस्तों को विभाजित, स्कैन और ट्रैक करें।',
     nav: {
@@ -716,7 +716,7 @@ export const translations: Record<SupportedLanguage, Translations> = {
   },
 
   or: {
-    appName: 'QR SplitPay India',
+    appName: 'Split UPI QR',
     tagline: 'ଭାଗ କରନ୍ତୁ. ସ୍କାନ କରନ୍ତୁ. ପେ କରନ୍ତୁ. ଟ୍ରାକ କରନ୍ତୁ.',
     subtitle: 'କ୍ଲାଉଡ୍ ସିଙ୍କ ସହିତ ୟୁପିଆଇ କିସ୍ତିଗୁଡ଼ିକୁ ସହଜରେ ଭାଗ, ସ୍କାନ ଏବଂ ଟ୍ରାକ କରନ୍ତୁ।',
     nav: {

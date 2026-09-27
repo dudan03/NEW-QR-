@@ -1,5 +1,5 @@
 import React from 'react';
-import { SupportedLanguage, UserAccount, SyncStatusState } from '../types';
+import { SupportedLanguage, UserAccount, SyncStatusState, UsageSummary } from '../types';
 import { translations } from '../locales';
 import {
   QrCode,
@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   User,
   Bell,
+  ShieldCheck,
 } from 'lucide-react';
 import { PWAInstallButton } from './PWAInstallButton';
 
@@ -32,6 +33,10 @@ interface TopBarProps {
   onOpenLanding?: () => void;
   notificationCount?: number;
   onOpenNotifications?: () => void;
+  onOpenSecurity?: () => void;
+  isPro?: boolean;
+  dailyUsage?: UsageSummary | null;
+  onOpenPricing?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -49,6 +54,10 @@ export const TopBar: React.FC<TopBarProps> = ({
   onOpenLanding,
   notificationCount = 0,
   onOpenNotifications,
+  onOpenSecurity,
+  isPro = false,
+  dailyUsage,
+  onOpenPricing,
 }) => {
   const t = translations[language];
 
@@ -66,7 +75,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           </div>
           <div>
             <h1 className="text-sm sm:text-base font-black tracking-tight text-slate-900 dark:text-white leading-none">
-              QR SplitPay <span className="text-blue-600">India</span>
+              Split UPI <span className="text-blue-600">QR</span>
             </h1>
             <p className="text-[10px] text-slate-400 font-medium hidden sm:block">
               {t.tagline}
@@ -115,6 +124,45 @@ export const TopBar: React.FC<TopBarProps> = ({
           <div className="hidden sm:block">
             <PWAInstallButton variant="compact" />
           </div>
+
+          {/* Pro Status Badge / Free Usage Indicator & Upgrade Button */}
+          {isPro ? (
+            <button
+              type="button"
+              onClick={onOpenPricing}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-[11px] font-black text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 transition shadow-2xs cursor-pointer"
+              title="Split UPI QR Pro Active. Click to view subscription."
+            >
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>PRO</span>
+            </button>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              {/* Mobile/Desktop Free Usage Badge (PRD Section 21) */}
+              <button
+                type="button"
+                onClick={onOpenPricing}
+                className="flex items-center gap-1 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 text-[11px] font-bold hover:bg-slate-200 transition shadow-2xs cursor-pointer"
+                title={`Free Plan: ${dailyUsage ? dailyUsage.used : 0} of 4 QR requests used today. Click to view details.`}
+              >
+                <span className="text-slate-500 font-medium">Free</span>
+                <span className={dailyUsage && dailyUsage.used >= 4 ? 'text-amber-600 font-black' : 'text-blue-600 dark:text-blue-400 font-black'}>
+                  · {dailyUsage ? dailyUsage.used : 0}/4
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={onOpenPricing}
+                className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-[11px] font-extrabold transition shadow-xs cursor-pointer shrink-0"
+                title="Upgrade to Split UPI QR Pro — ₹999 for 6 Months"
+              >
+                <Sparkles className="w-3 h-3 text-amber-300" />
+                <span className="hidden sm:inline">Get Pro</span>
+                <span className="font-mono">₹999</span>
+              </button>
+            </div>
+          )}
 
           {/* User Account / Sign-In Button */}
           {user ? (
@@ -214,6 +262,18 @@ export const TopBar: React.FC<TopBarProps> = ({
               <Moon className="w-3.5 h-3.5" />
             )}
           </button>
+
+          {/* Security Architecture Console Trigger */}
+          {onOpenSecurity && (
+            <button
+              type="button"
+              onClick={onOpenSecurity}
+              className="w-8 h-8 rounded-lg border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors"
+              title="Security & Architecture Console (Firebase & Cloudflare)"
+            >
+              <ShieldCheck className="w-4 h-4" />
+            </button>
+          )}
 
           {/* Demo Button if not yet loaded */}
           {!hasDemoSession && (

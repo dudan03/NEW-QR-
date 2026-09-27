@@ -48,7 +48,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
   };
 
   const handleShare = async () => {
-    const text = `*QR SplitPay India - Payment Record*\nSession ID: ${session.id}\nCustomer: ${session.customerName || 'N/A'}\nInvoice: ${session.invoiceId || 'N/A'}\nTotal: ${formatPaise(session.totalAmountPaise)}\nPaid to date: ${formatPaise(paidPaise)}\nStatus: ${t.states[session.status]}\n\n(Merchant-generated record; not a bank-issued receipt)`;
+    const text = `*Split UPI QR - Payment Record*\nSession ID: ${session.id}\nCustomer: ${session.customerName || 'N/A'}\nInvoice: ${session.invoiceId || 'N/A'}\nTotal: ${formatPaise(session.totalAmountPaise)}\nPaid to date: ${formatPaise(paidPaise)}\nStatus: ${t.states[session.status]}\n\n(Merchant-generated record; not a bank-issued receipt)`;
 
     if (navigator.share) {
       try {
@@ -103,7 +103,7 @@ ${merchantProfile.receiptFooter ? `\nNOTE: ${merchantProfile.receiptFooter}\n` :
 ========================================
 DISCLAIMER:
 Merchant-generated payment record; not a bank-issued receipt.
-QR SplitPay India does not process, hold, or settle funds.
+Split UPI QR does not process, hold, or settle funds.
 ========================================`;
 
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
@@ -318,7 +318,7 @@ QR SplitPay India does not process, hold, or settle funds.
                 {t.receipt.disclaimer}
               </p>
               <p>
-                Generated via QR SplitPay India utility. All receipts subject to merchant's independent verification.
+                Generated via Split UPI QR utility. All receipts subject to merchant's independent verification.
               </p>
             </div>
           </div>

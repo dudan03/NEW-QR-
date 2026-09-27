@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode';
+import { motion, AnimatePresence } from 'motion/react';
+import confetti from 'canvas-confetti';
 import { Installment, PaymentSession, SupportedLanguage } from '../types';
 import { formatPaise } from '../utils/currency';
 import { translations } from '../locales';
@@ -147,31 +149,48 @@ export const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
         </div>
       </div>
 
-      {/* Amount Display */}
-      <div className="text-center py-4">
-        <div className="text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
-          {formatPaise(installment.amountPaise)}
-        </div>
-        <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center justify-center gap-1">
-          <span>{session.customerName || 'Customer'}</span>
-          {session.invoiceId && (
-            <>
-              <span>·</span>
-              <span>{session.invoiceId}</span>
-            </>
-          )}
-        </div>
-      </div>
+      {/* Animated QR Code Presentation */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={installment.id}
+          initial={{ opacity: 0, scale: 0.94, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.94, y: -12 }}
+          transition={{
+            type: 'spring',
+            stiffness: 340,
+            damping: 28,
+            mass: 0.8,
+          }}
+          className="w-full flex flex-col items-center"
+        >
+          {/* Amount Display */}
+          <div className="text-center py-3">
+            <div className="text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
+              {formatPaise(installment.amountPaise)}
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center justify-center gap-1">
+              <span>{session.customerName || 'Customer'}</span>
+              {session.invoiceId && (
+                <>
+                  <span>·</span>
+                  <span>{session.invoiceId}</span>
+                </>
+              )}
+            </div>
+          </div>
 
-      {/* QR Code Container */}
-      <div className="flex flex-col items-center justify-center p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800 my-2">
-        <div className="bg-white p-3 rounded-lg shadow-xs">
-          <canvas ref={canvasRef} className="max-w-[200px] max-h-[200px] w-full h-auto block" />
-        </div>
-        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 text-center">
-          Scan with any UPI app (GPay, PhonePe, Paytm, BHIM, Bank UPI)
-        </p>
-      </div>
+          {/* QR Code Container */}
+          <div className="relative flex flex-col items-center justify-center p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800 my-2 w-full max-w-[280px]">
+            <div className="bg-white p-3 rounded-xl shadow-xs ring-1 ring-slate-900/5 transition-all">
+              <canvas ref={canvasRef} className="max-w-[200px] max-h-[200px] w-full h-auto block" />
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 text-center">
+              Scan with any UPI app (GPay, PhonePe, Paytm, BHIM, Bank UPI)
+            </p>
+          </div>
+        </motion.div>
+      </AnimatePresence>
 
       {/* Payee UPI ID row with copy */}
       <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/80 px-3 py-2 rounded-lg text-xs mt-3">
@@ -205,7 +224,17 @@ export const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
         {!isConfirmed ? (
           <button
             type="button"
-            onClick={() => onMarkReceived(installment)}
+            onClick={() => {
+              try {
+                confetti({
+                  particleCount: 50,
+                  spread: 60,
+                  origin: { y: 0.7 },
+                  colors: ['#10b981', '#3b82f6', '#f59e0b', '#6366f1'],
+                });
+              } catch {}
+              onMarkReceived(installment);
+            }}
             className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
           >
             <Check className="w-4 h-4" />

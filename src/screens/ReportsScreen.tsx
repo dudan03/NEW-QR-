@@ -159,7 +159,7 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
 
     setIsExporting(true);
     try {
-      const shopName = profile?.businessName || 'RepairKhata';
+      const shopName = profile?.businessName || 'SplitPay';
       const cleanShopName = shopName.replace(/[^a-zA-Z0-9_-]/g, '_');
 
       let csvContent = '';

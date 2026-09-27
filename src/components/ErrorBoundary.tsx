@@ -17,6 +17,14 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   public static getDerivedStateFromError(error: Error): State {
+    const msg = (error?.message || String(error) || '').toLowerCase();
+    if (
+      msg.includes('websocket') ||
+      msg.includes('[vite]') ||
+      msg.includes('closed without opened')
+    ) {
+      return { hasError: false, error: null };
+    }
     return { hasError: true, error };
   }
 

@@ -188,10 +188,29 @@ export const PaymentsScreen: React.FC<PaymentsScreenProps> = ({
                   <span className="font-bold text-slate-900 dark:text-white">
                     {currentSession.customerName || 'Customer'}
                   </span>
+                  {currentSession.title && (
+                    <span className="text-slate-500 dark:text-slate-400 font-medium ml-1">
+                      · {currentSession.title}
+                    </span>
+                  )}
                   <span className="text-slate-400 mx-1">·</span>
                   <span className="font-bold text-slate-800 dark:text-slate-200 tabular-nums">
                     {formatPaise(currentSession.totalAmountPaise)}
                   </span>
+                  {currentSession.category && (
+                    <span className="ml-2 text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 uppercase">
+                      {currentSession.category}
+                    </span>
+                  )}
+                  {currentSession.tags && currentSession.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {currentSession.tags.map((t) => (
+                        <span key={t} className="text-[10px] text-slate-500 dark:text-slate-400">
+                          #{t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <button

@@ -6,9 +6,11 @@ import {
   SplitMethod,
   UserAccount,
   SyncStatusState,
+  Subscription,
 } from '../types';
 import { translations } from '../locales';
 import { StorageService } from '../services/storage';
+import { formatCalendarDate } from '../utils/subscription';
 import {
   Store,
   User,
@@ -31,6 +33,7 @@ import {
   ExternalLink,
   Bell,
   BellRing,
+  Globe,
 } from 'lucide-react';
 import { SyncStatusBadge } from '../components/SyncStatusBadge';
 import { PWAInstallButton } from '../components/PWAInstallButton';
@@ -53,6 +56,10 @@ interface SettingsScreenProps {
   onClearAllData: () => void;
   onOpenOnboarding: () => void;
   onRestoreBackup: (jsonStr: string) => void;
+  onOpenSecurity?: () => void;
+  isPro?: boolean;
+  subscription?: Subscription | null;
+  onOpenPricing?: () => void;
 }
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({
@@ -73,6 +80,10 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   onClearAllData,
   onOpenOnboarding,
   onRestoreBackup,
+  onOpenSecurity,
+  isPro = false,
+  subscription,
+  onOpenPricing,
 }) => {
   const t = translations[language];
 
@@ -202,23 +213,47 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           </div>
         </div>
 
-        {/* Subscription Plan Preview */}
-        <div className="mt-3.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between text-xs">
-          <div>
-            <span className="text-[10px] uppercase font-bold text-slate-400">
-              {t.subscription.currentPlan}
-            </span>
-            <p className="font-extrabold text-slate-900 dark:text-white">
-              {user?.plan === 'PRO' ? t.subscription.pro : t.subscription.free}
-            </p>
+        {/* Subscription Plan Card (PRD Section 19) */}
+        <div className="mt-3.5 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-800 space-y-2.5 text-xs">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-slate-400">
+                Current Plan
+              </span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <p className="font-extrabold text-slate-900 dark:text-white text-sm">
+                  {isPro ? 'Split UPI QR Pro' : 'Free Tier'}
+                </p>
+                {isPro && (
+                  <span className="text-[10px] font-black uppercase px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                    ACTIVE
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {onOpenPricing && (
+              <button
+                type="button"
+                onClick={onOpenPricing}
+                className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs shadow-xs transition cursor-pointer"
+              >
+                {isPro ? 'Manage / Extend' : 'Upgrade to Pro — ₹999'}
+              </button>
+            )}
           </div>
-          <button
-            type="button"
-            onClick={() => onOpenLegal('terms')}
-            className="text-blue-600 dark:text-blue-400 hover:underline font-semibold"
-          >
-            {t.subscription.upgrade}
-          </button>
+
+          {subscription && isPro && (
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+              Valid until <strong>{formatCalendarDate(subscription.expiryDate)}</strong> (6 Calendar Months, ₹999 one-time).
+            </div>
+          )}
+
+          {subscription && subscription.status === 'EXPIRED' && (
+            <div className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+              Expired on {formatCalendarDate(subscription.expiryDate)}. Historical data retained.
+            </div>
+          )}
         </div>
       </div>
 
@@ -538,6 +573,98 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           </span>
           <span className="text-[10px] text-slate-400 font-normal">4-step walkthrough</span>
         </button>
+      </div>
+
+      {/* Custom Domain Connection (splitupiqr.in) */}
+      <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-900 dark:to-emerald-950/30 rounded-2xl border border-emerald-200 dark:border-emerald-900/60 shadow-xs space-y-3">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs">
+              <Globe className="w-4 h-4" />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <span>Custom Domain</span>
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400">
+                  splitupiqr.in
+                </span>
+              </h4>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Connected with Cloudflare Edge SSL/TLS & Anti-Bot Protection
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-emerald-100 dark:border-slate-800 space-y-1.5 text-[11px]">
+          <div className="flex items-center justify-between">
+            <span className="text-slate-500 dark:text-slate-400">Domain Name:</span>
+            <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">https://splitupiqr.in</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-slate-500 dark:text-slate-400">DNS Proxy Status:</span>
+            <span className="font-semibold text-slate-700 dark:text-slate-300">Cloudflare Proxied (Orange)</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-slate-500 dark:text-slate-400">Brand Name:</span>
+            <span className="font-bold text-blue-600">Split UPI QR</span>
+          </div>
+        </div>
+
+        {onOpenSecurity && (
+          <button
+            type="button"
+            onClick={onOpenSecurity}
+            className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-2"
+          >
+            <span>View DNS Records & Setup Guide</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+
+      {/* Enterprise Security & Architecture Console */}
+      <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-blue-950/40 rounded-2xl border border-blue-200 dark:border-blue-900/60 shadow-xs space-y-3">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+              <Shield className="w-4 h-4" />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <span>Enterprise Security Architecture</span>
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400">
+                  Protected
+                </span>
+              </h4>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Firebase App Check, Cloudflare WAF & 15m Session Timeout
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 text-[11px]">
+          <div className="p-2 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-blue-100 dark:border-slate-800">
+            <div className="text-slate-500 dark:text-slate-400 text-[10px]">App Check & OTP</div>
+            <div className="font-bold text-slate-800 dark:text-slate-200">reCAPTCHA v3 & Ent.</div>
+          </div>
+          <div className="p-2 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-blue-100 dark:border-slate-800">
+            <div className="text-slate-500 dark:text-slate-400 text-[10px]">Edge Network WAF</div>
+            <div className="font-bold text-slate-800 dark:text-slate-200">Rate Limiter & Anti-Bot</div>
+          </div>
+        </div>
+
+        {onOpenSecurity && (
+          <button
+            type="button"
+            onClick={onOpenSecurity}
+            className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-2"
+          >
+            <span>Open Security Console & View Rules</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
       {/* Legal & Policy Links */}

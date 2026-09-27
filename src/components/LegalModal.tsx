@@ -29,7 +29,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
               <h2 className="text-base font-bold text-slate-900 dark:text-white">
                 Legal, Privacy & Data Policies
               </h2>
-              <p className="text-[11px] text-slate-500">QR SplitPay India • v2.0 Compliance</p>
+              <p className="text-[11px] text-slate-500">Split UPI QR • v2.0 Compliance</p>
             </div>
           </div>
           <button
@@ -88,7 +88,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
                   What We NEVER Collect or Store:
                 </p>
                 <p>
-                  QR SplitPay India NEVER requests, stores, or processes:
+                  Split UPI QR NEVER requests, stores, or processes:
                   <strong> UPI PINs, Net Banking Passwords, OTPs, ATM/Debit Card PINs, or Bank Account Credentials.</strong>
                 </p>
               </div>
@@ -96,7 +96,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
               <div>
                 <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">1. Information We Collect</h4>
                 <p>
-                  When you use QR SplitPay India, we store only the data essential to generating UPI installment payment requests and managing your merchant bookkeeping:
+                  When you use Split UPI QR, we store only the data essential to generating UPI installment payment requests and managing your merchant bookkeeping:
                 </p>
                 <ul className="list-disc pl-5 mt-1 space-y-1">
                   <li><strong>Account Profile:</strong> Name, Google Account ID, and Email address used for authentication.</li>
@@ -121,7 +121,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
               <div>
                 <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">3. Google Account Integration</h4>
                 <p>
-                  Google authentication is used exclusively for single-sign-on (SSO) identity verification. We do NOT access your private Google Drive files or Gmail messages without explicit consent. Your data is stored on QR SplitPay's secure cloud database keyed to your verified account ID.
+                  Google authentication is used exclusively for single-sign-on (SSO) identity verification. We do NOT access your private Google Drive files or Gmail messages without explicit consent. Your data is stored on Split UPI QR's secure cloud database keyed to your verified account ID.
                 </p>
               </div>
             </>
@@ -132,7 +132,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
               <div>
                 <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">1. Core Non-Provider Principle</h4>
                 <p>
-                  QR SplitPay India is a <strong>software management utility</strong> for generating UPI payment intent links and tracking installment schedules.
+                  Split UPI QR is a <strong>software management utility</strong> for generating UPI payment intent links and tracking installment schedules.
                   It is <strong>NOT a payment aggregator, banking institution, or payment gateway</strong>.
                 </p>
               </div>
@@ -164,14 +164,14 @@ export const LegalModal: React.FC<LegalModalProps> = ({
               <div>
                 <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">1. Multi-Device Synchronization & Conflict Handling</h4>
                 <p>
-                  QR SplitPay uses timestamped, record-level synchronization. When modifying customer or installment data on multiple devices, updates are merged safely at the entity level so changes on one device do not overwrite unrelated records on another.
+                  Split UPI QR uses timestamped, record-level synchronization. When modifying customer or installment data on multiple devices, updates are merged safely at the entity level so changes on one device do not overwrite unrelated records on another.
                 </p>
               </div>
 
               <div>
                 <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">2. Offline Queue</h4>
                 <p>
-                  When your device is temporarily disconnected from the internet, QR SplitPay allows you to view history, create new installment plans, generate QR codes, and record manual confirmations. Changes are queued locally and automatically pushed to the cloud once network connectivity is restored.
+                  When your device is temporarily disconnected from the internet, Split UPI QR allows you to view history, create new installment plans, generate QR codes, and record manual confirmations. Changes are queued locally and automatically pushed to the cloud once network connectivity is restored.
                 </p>
               </div>
 

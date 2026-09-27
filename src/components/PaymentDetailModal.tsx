@@ -62,19 +62,36 @@ export const PaymentDetailModal: React.FC<PaymentDetailModalProps> = ({
         {/* Top Header */}
         <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                {session.id}
+                {session.title || session.id}
               </h2>
+              {session.category && (
+                <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-200">
+                  {session.category}
+                </span>
+              )}
               {session.isDemo && (
                 <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300">
                   DEMO DATA
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Created on {new Date(session.createdAt).toLocaleDateString()}
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Ref: <span className="font-mono">{session.id}</span> · Created on {new Date(session.createdAt).toLocaleDateString()}
             </p>
+            {session.tags && session.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-1.5">
+                {session.tags.map((t) => (
+                  <span
+                    key={t}
+                    className="text-[10px] font-medium px-2 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                  >
+                    #{t}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
           <button
             type="button"
