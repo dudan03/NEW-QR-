@@ -7,6 +7,9 @@ import {
   Loader2,
   Lock,
   UserCheck,
+  LogOut,
+  LogIn,
+  CheckCircle2,
 } from 'lucide-react';
 import { ApiService } from '../services/api';
 import {
@@ -17,15 +20,19 @@ import {
 interface AuthModalProps {
   isOpen: boolean;
   language: SupportedLanguage;
+  user?: UserAccount | null;
   onClose: () => void;
   onSuccess: (user: UserAccount, stats: any) => void;
+  onLogout?: () => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   language,
+  user,
   onClose,
   onSuccess,
+  onLogout,
 }) => {
   const t = translations[language].auth;
   const [loading, setLoading] = useState(false);
@@ -53,11 +60,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       const auth = getFirebaseAuth();
       if (auth) {
         try {
-          const user = await signInWithGooglePopup();
-          if (user.email) email = user.email;
-          if (user.displayName) name = user.displayName;
-          if (user.photoURL) avatarUrl = user.photoURL;
-          googleId = user.uid;
+          const popupUser = await signInWithGooglePopup();
+          if (popupUser.email) email = popupUser.email;
+          if (popupUser.displayName) name = popupUser.displayName;
+          if (popupUser.photoURL) avatarUrl = popupUser.photoURL;
+          googleId = popupUser.uid;
         } catch (popupErr: any) {
           if (popupErr.code === 'auth/popup-closed-by-user') {
             setLoading(false);
@@ -99,10 +106,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <UserCheck className="w-6 h-6" />
           </div>
           <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">
-            Secure Merchant Login
+            {user ? 'Merchant Account' : 'Secure Merchant Login'}
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto">
-            Access your split UPI payments, sync across devices, and manage your CRM data.
+            {user
+              ? `Currently authenticated as ${user.email}`
+              : 'Access your split UPI payments, sync across devices, and manage your CRM data.'}
           </p>
         </div>
 
@@ -112,77 +121,140 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
         )}
 
-        {/* Direct Google Login Button */}
-        <div className="space-y-4">
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white font-bold text-sm shadow-xs hover:bg-slate-50 dark:hover:bg-slate-750 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
-          >
-            {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
-            ) : (
-              <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+        {/* If user is already logged in, show current profile & Logout button */}
+        {user ? (
+          <div className="space-y-4">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center gap-3">
+              {user.picture ? (
+                <img
+                  src={user.picture}
+                  alt={user.name}
+                  className="w-12 h-12 rounded-2xl object-cover border border-slate-300 dark:border-slate-600"
                 />
-                <path
-                  fill="#34A853"
-                  d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 9.97 0 12s.45 3.84 1.25 5.42l4.03-3.15z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-                />
-              </svg>
-            )}
-            <span>{loading ? 'Signing In...' : t.continueWithGoogle}</span>
-          </button>
-
-          {/* Account Switcher / Customizer */}
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-center">
-            <button
-              type="button"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition cursor-pointer"
-            >
-              {showAdvanced ? 'Hide Custom Account Details' : 'Account Details / Switch Account'}
-            </button>
-
-            {showAdvanced && (
-              <div className="mt-3 text-left space-y-2.5 animate-in fade-in duration-150 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                    Google Email
-                  </label>
-                  <input
-                    type="email"
-                    value={customEmail}
-                    onChange={(e) => setCustomEmail(e.target.value)}
-                    className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-blue-500"
-                  />
+              ) : (
+                <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white font-black text-base flex items-center justify-center">
+                  {user.name.charAt(0)}
                 </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                    Merchant Name
-                  </label>
-                  <input
-                    type="text"
-                    value={customName}
-                    onChange={(e) => setCustomName(e.target.value)}
-                    className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-blue-500"
-                  />
+              )}
+              <div className="grow overflow-hidden">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                    {user.name}
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                    Verified
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                  {user.email}
+                </p>
+                <div className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span>Google OAuth Active</span>
                 </div>
               </div>
-            )}
+            </div>
+
+            {/* Logout and Switch Account Actions */}
+            <div className="space-y-2 pt-1">
+              {onLogout && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onLogout();
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-rose-600 hover:bg-rose-700 active:scale-98 text-white font-bold text-xs rounded-xl shadow-xs transition cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Log Out from this Device</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-xs rounded-xl transition cursor-pointer"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Switch Google Account</span>
+              </button>
+            </div>
           </div>
-        </div>
+        ) : (
+          /* Direct Google Login View */
+          <div className="space-y-4">
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white font-bold text-sm shadow-xs hover:bg-slate-50 dark:hover:bg-slate-750 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+              ) : (
+                <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 9.97 0 12s.45 3.84 1.25 5.42l4.03-3.15z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                  />
+                </svg>
+              )}
+              <span>{loading ? 'Signing In...' : t.continueWithGoogle}</span>
+            </button>
+
+            {/* Account Switcher / Customizer */}
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-center">
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition cursor-pointer"
+              >
+                {showAdvanced ? 'Hide Custom Account Details' : 'Account Details / Switch Account'}
+              </button>
+
+              {showAdvanced && (
+                <div className="mt-3 text-left space-y-2.5 animate-in fade-in duration-150 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                      Google Email
+                    </label>
+                    <input
+                      type="email"
+                      value={customEmail}
+                      onChange={(e) => setCustomEmail(e.target.value)}
+                      className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                      Merchant Name
+                    </label>
+                    <input
+                      type="text"
+                      value={customName}
+                      onChange={(e) => setCustomName(e.target.value)}
+                      className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Security Trust Badges */}
         <div className="mt-6 space-y-2 text-[11px] text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800">

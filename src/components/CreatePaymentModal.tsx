@@ -105,7 +105,14 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
   const [dueSchedule, setDueSchedule] = useState<'none' | 'weekly' | 'biweekly' | 'monthly'>('weekly');
 
   // Validation errors
-  const [errors, setErrors] = useState<{ upiId?: string; totalAmount?: string; split?: string }>({});
+  const [errors, setErrors] = useState<{
+    upiId?: string;
+    totalAmount?: string;
+    split?: string;
+    customerName?: string;
+    customerPhone?: string;
+    payeeName?: string;
+  }>({});
 
   useEffect(() => {
     if (merchantProfile.upiId) {
@@ -234,17 +241,40 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
     }
   };
 
-  // Submission handler
+  // Submission handler (Strict details required before scanner/QR opens)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newErrors: { upiId?: string; totalAmount?: string; split?: string } = {};
+    const newErrors: {
+      upiId?: string;
+      totalAmount?: string;
+      split?: string;
+      customerName?: string;
+      customerPhone?: string;
+      payeeName?: string;
+    } = {};
 
-    if (!isValidUpiId(upiId)) {
-      newErrors.upiId = t.form.upiIdError;
+    // 1. Merchant Details Validation
+    if (!upiId.trim() || !isValidUpiId(upiId)) {
+      newErrors.upiId = t.form.upiIdError || 'Valid UPI ID is required (e.g. name@okhdfcbank)';
     }
 
+    if (!payeeName.trim()) {
+      newErrors.payeeName = 'Merchant / Business name is required.';
+    }
+
+    // 2. Customer Details Mandatory Validation
+    if (!customerName.trim()) {
+      newErrors.customerName = 'Customer name is required before generating QR codes.';
+    }
+
+    const cleanPhone = customerPhone.replace(/[^0-9]/g, '');
+    if (!customerPhone.trim() || cleanPhone.length < 10) {
+      newErrors.customerPhone = 'Valid 10-digit customer mobile number is required.';
+    }
+
+    // 3. Amount & Split Validation
     if (totalPaise <= 0) {
-      newErrors.totalAmount = t.form.totalAmountError;
+      newErrors.totalAmount = t.form.totalAmountError || 'Please enter total bill amount greater than ₹0.';
     }
 
     if (splitMethod === 'CUSTOM') {
@@ -441,116 +471,172 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
               )}
 
               {/* Merchant UPI ID & Payee */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                {t.form.upiIdLabel}
-              </label>
-              <input
-                type="text"
-                value={upiId}
-                onChange={(e) => {
-                  setUpiId(e.target.value);
-                  if (errors.upiId) setErrors({ ...errors, upiId: undefined });
-                }}
-                placeholder={t.form.upiIdPlaceholder}
-                className="w-full h-10 px-3 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.upiId && (
-                <span className="text-[11px] text-red-500 mt-1 block font-medium">
-                  {errors.upiId}
-                </span>
-              )}
-            </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {t.form.upiIdLabel} <span className="text-rose-500 font-bold">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={upiId}
+                    onChange={(e) => {
+                      setUpiId(e.target.value);
+                      if (errors.upiId) setErrors({ ...errors, upiId: undefined });
+                    }}
+                    placeholder={t.form.upiIdPlaceholder}
+                    className={`w-full h-10 px-3 text-xs font-mono rounded-xl border ${
+                      errors.upiId
+                        ? 'border-rose-500 ring-1 ring-rose-500 bg-rose-50/20'
+                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'
+                    } text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-500`}
+                  />
+                  {errors.upiId && (
+                    <span className="text-[11px] text-rose-500 mt-1 block font-medium">
+                      {errors.upiId}
+                    </span>
+                  )}
+                </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                {t.form.payeeNameLabel}
-              </label>
-              <input
-                type="text"
-                value={payeeName}
-                onChange={(e) => setPayeeName(e.target.value)}
-                placeholder="Merchant or Shop Name"
-                className="w-full h-10 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-
-          {/* CRM Customer Selector */}
-          <div className="p-3 bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 rounded-xl space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-blue-600" />
-                <span>Customer Selection</span>
-              </span>
-              {customers.length > 0 && (
-                <select
-                  value={selectedCustomerId}
-                  onChange={(e) => handleSelectCustomer(e.target.value)}
-                  className="text-xs px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
-                >
-                  <option value="new">+ New Customer</option>
-                  {customers.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name} ({c.phone})
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div>
-                <input
-                  type="text"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="Customer Name (e.g. Rahul Kumar)"
-                  className="w-full h-9 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-                />
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {t.form.payeeNameLabel} <span className="text-rose-500 font-bold">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={payeeName}
+                    onChange={(e) => {
+                      setPayeeName(e.target.value);
+                      if (errors.payeeName) setErrors({ ...errors, payeeName: undefined });
+                    }}
+                    placeholder="Merchant or Shop Name"
+                    className={`w-full h-10 px-3 text-xs rounded-xl border ${
+                      errors.payeeName
+                        ? 'border-rose-500 ring-1 ring-rose-500 bg-rose-50/20'
+                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'
+                    } text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-500`}
+                  />
+                  {errors.payeeName && (
+                    <span className="text-[11px] text-rose-500 mt-1 block font-medium">
+                      {errors.payeeName}
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <div>
-                <input
-                  type="tel"
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                  placeholder="Customer Phone (+91 ...)"
-                  className="w-full h-9 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
-                />
-              </div>
-            </div>
-          </div>
+              {/* CRM Customer Details (Mandatory) */}
+              <div className="p-3.5 bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 rounded-xl space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Customer Details (Required for QR & Receipt)</span>
+                    <span className="text-rose-500 font-bold">*</span>
+                  </span>
+                  {customers.length > 0 && (
+                    <select
+                      value={selectedCustomerId}
+                      onChange={(e) => handleSelectCustomer(e.target.value)}
+                      className="text-xs px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                    >
+                      <option value="new">+ New Customer</option>
+                      {customers.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name} ({c.phone})
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
 
-          {/* Total Amount Input */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              {t.form.totalAmountLabel}
-            </label>
-            <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">
-                ₹
-              </span>
-              <input
-                type="number"
-                min="1"
-                step="any"
-                value={totalAmountStr}
-                onChange={(e) => {
-                  setTotalAmountStr(e.target.value);
-                  if (errors.totalAmount) setErrors({ ...errors, totalAmount: undefined });
-                }}
-                placeholder={t.form.totalAmountPlaceholder}
-                className="w-full h-11 pl-8 pr-3 text-base font-bold tabular-nums rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            {errors.totalAmount && (
-              <span className="text-[11px] text-red-500 mt-1 block font-medium">
-                {errors.totalAmount}
-              </span>
-            )}
-          </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                      Customer Name <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={customerName}
+                      onChange={(e) => {
+                        setCustomerName(e.target.value);
+                        if (errors.customerName) setErrors({ ...errors, customerName: undefined });
+                      }}
+                      placeholder="e.g. Rahul Kumar"
+                      className={`w-full h-9 px-3 text-xs rounded-xl border ${
+                        errors.customerName
+                          ? 'border-rose-500 ring-1 ring-rose-500 bg-rose-50/20'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'
+                      } text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500`}
+                    />
+                    {errors.customerName && (
+                      <span className="text-[11px] text-rose-500 mt-1 block font-medium">
+                        {errors.customerName}
+                      </span>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                      Customer Mobile Phone <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      value={customerPhone}
+                      onChange={(e) => {
+                        setCustomerPhone(e.target.value);
+                        if (errors.customerPhone) setErrors({ ...errors, customerPhone: undefined });
+                      }}
+                      placeholder="10-digit mobile (+91 ...)"
+                      className={`w-full h-9 px-3 text-xs rounded-xl border ${
+                        errors.customerPhone
+                          ? 'border-rose-500 ring-1 ring-rose-500 bg-rose-50/20'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'
+                      } text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-blue-500`}
+                    />
+                    {errors.customerPhone && (
+                      <span className="text-[11px] text-rose-500 mt-1 block font-medium">
+                        {errors.customerPhone}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Total Amount Input */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  {t.form.totalAmountLabel} <span className="text-rose-500 font-bold">*</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">
+                    ₹
+                  </span>
+                  <input
+                    type="number"
+                    min="1"
+                    step="any"
+                    required
+                    value={totalAmountStr}
+                    onChange={(e) => {
+                      setTotalAmountStr(e.target.value);
+                      if (errors.totalAmount) setErrors({ ...errors, totalAmount: undefined });
+                    }}
+                    placeholder={t.form.totalAmountPlaceholder}
+                    className={`w-full h-11 pl-8 pr-3 text-base font-bold tabular-nums rounded-xl border ${
+                      errors.totalAmount
+                        ? 'border-rose-500 ring-1 ring-rose-500 bg-rose-50/20'
+                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'
+                    } text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-500`}
+                  />
+                </div>
+                {errors.totalAmount && (
+                  <span className="text-[11px] text-rose-500 mt-1 block font-medium">
+                    {errors.totalAmount}
+                  </span>
+                )}
+              </div>
 
           {/* Split Method Segmented Selector */}
           <div>

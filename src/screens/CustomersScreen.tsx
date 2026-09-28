@@ -455,7 +455,7 @@ export const CustomersScreen: React.FC<CustomersScreenProps> = ({
                 required
                 value={editingCustomer.phone || ''}
                 onChange={(e) => setEditingCustomer({ ...editingCustomer, phone: e.target.value })}
-                placeholder="+91 98765 43210"
+                placeholder="9876543210"
                 className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono focus:outline-hidden focus:ring-1 focus:ring-blue-500"
               />
             </div>

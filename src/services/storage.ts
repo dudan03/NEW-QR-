@@ -39,12 +39,12 @@ const STORAGE_KEYS = {
 
 const DEFAULT_PROFILE: BusinessProfile = {
   id: 'biz-default-01',
-  businessName: 'Sharma Electronics & Services',
-  displayName: 'Ramesh Sharma',
-  upiId: 'sharma.stores@upi',
-  phone: '+91 98765 43210',
-  email: 'ramesh.sharma@example.com',
-  address: 'Shop 14, Main Market, Bhubaneswar, Odisha',
+  businessName: '',
+  displayName: '',
+  upiId: '',
+  phone: '',
+  email: '',
+  address: '',
   invoicePrefix: 'INV',
   receiptFooter: 'Thank you for your business! Merchant-generated payment record.',
   currency: 'INR',

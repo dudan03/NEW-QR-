@@ -45,6 +45,7 @@ import { OfflineIndicator } from './components/OfflineIndicator';
 import { NotificationToastBanner } from './components/NotificationToastBanner';
 import { NotificationCenterModal } from './components/NotificationCenterModal';
 import { SecurityArchitectureModal } from './components/SecurityArchitectureModal';
+import { GoogleAuthGate } from './components/GoogleAuthGate';
 import { useInactivityTimeout } from './hooks/useInactivityTimeout';
 import { logoutFirebaseUser } from './services/firebaseAuth';
 import { Lock, ShieldAlert } from 'lucide-react';
@@ -646,6 +647,18 @@ export default function App() {
     );
   }
 
+  // Strict Google Authentication Gate: if user is not logged in with Google,
+  // do not open the dashboard. Show the Google Verification Gate until verified.
+  if (!user) {
+    return (
+      <GoogleAuthGate
+        language={settings.language}
+        onSuccess={handleGoogleSuccess}
+        onLanguageChange={handleLanguageChange}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors">
       {/* Offline Alert Banner */}
@@ -665,6 +678,7 @@ export default function App() {
         onLoadDemo={handleLoadDemo}
         user={user}
         onOpenAuth={() => setIsAuthOpen(true)}
+        onLogout={handleLogout}
         syncStatus={syncStatus}
         onSyncNow={triggerSync}
         onOpenLanding={() => setShowLanding(true)}
@@ -929,8 +943,10 @@ export default function App() {
       <AuthModal
         isOpen={isAuthOpen}
         language={settings.language}
+        user={user}
         onClose={() => setIsAuthOpen(false)}
         onSuccess={handleGoogleSuccess}
+        onLogout={handleLogout}
       />
 
       {/* Welcome Back & Cloud Data Restore Modal */}
