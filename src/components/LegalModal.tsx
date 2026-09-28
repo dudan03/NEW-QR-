@@ -119,9 +119,19 @@ export const LegalModal: React.FC<LegalModalProps> = ({
               </div>
 
               <div>
-                <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">3. Google Account Integration</h4>
+                <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">3. Google Account Integration & Limited Use</h4>
                 <p>
-                  Google authentication is used exclusively for single-sign-on (SSO) identity verification. We do NOT access your private Google Drive files or Gmail messages without explicit consent. Your data is stored on Split UPI QR's secure cloud database keyed to your verified account ID.
+                  Google authentication is used exclusively for single-sign-on (SSO) identity verification and cloud sync. We request only basic profile & email scopes (<code className="font-mono text-blue-600">openid</code>, <code className="font-mono text-blue-600">email</code>, <code className="font-mono text-blue-600">profile</code>).
+                </p>
+                <div className="mt-2 p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] text-slate-700 dark:text-slate-300">
+                  <strong>Google API Services User Data Policy:</strong> Split UPI QR's use and transfer to any other app of information received from Google APIs will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline font-semibold">Google API Services User Data Policy</a>, including the Limited Use requirements.
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">4. No-Sale Policy & Developer Contact</h4>
+                <p>
+                  We NEVER sell, rent, or trade your personal or Google user data. For data inquiries or account deletion, contact: <a href="mailto:anshumanparida913@gmail.com" className="text-blue-600 font-semibold underline">anshumanparida913@gmail.com</a> (Split UPI QR Team, Bhubaneswar, Odisha, India).
                 </p>
               </div>
             </>

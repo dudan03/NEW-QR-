@@ -1,5 +1,5 @@
 {
-  "name": "QR SplitPay India",
+  "name": "Split UPI QR",
   "description": "Split, scan, and track UPI installment payments with accurate paise-based QR generation and merchant payment recording.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

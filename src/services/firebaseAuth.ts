@@ -216,6 +216,38 @@ export function subscribeToAuthChanges(callback: (user: User | null) => void): (
 }
 
 /**
+ * Parse Google ID Token JWT payload safely
+ */
+export function parseGoogleJwt(token: string): {
+  email?: string;
+  name?: string;
+  picture?: string;
+  sub?: string;
+} | null {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (err) {
+    console.warn('Failed to parse Google JWT:', err);
+    return null;
+  }
+}
+
+/**
+ * Google Web Client ID
+ */
+export const GOOGLE_CLIENT_ID =
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+  '225096409177-ee5ubisvr0vlt9235eme7mn3nv0olnn7.apps.googleusercontent.com';
+
+/**
  * Sign in with Google Auth Provider via Firebase Popup
  */
 export async function signInWithGooglePopup(): Promise<User> {
@@ -232,3 +264,4 @@ export async function signInWithGooglePopup(): Promise<User> {
   const result = await signInWithPopup(currentAuth, provider);
   return result.user;
 }
+

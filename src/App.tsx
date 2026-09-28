@@ -32,6 +32,7 @@ import { ReportsScreen } from './screens/ReportsScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { SubscriptionScreen } from './screens/SubscriptionScreen';
 import { LandingPage } from './components/LandingPage';
+import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { CreatePaymentModal } from './components/CreatePaymentModal';
 import { ManualConfirmModal } from './components/ManualConfirmModal';
 import { PaymentDetailModal } from './components/PaymentDetailModal';
@@ -93,7 +94,15 @@ export default function App() {
   const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
   const [isSecurityOpen, setIsSecurityOpen] = useState(false);
   const [securityToast, setSecurityToast] = useState<string | null>(null);
-  const [legalTab, setLegalTab] = useState<'privacy' | 'terms' | 'data' | null>(null);
+  const [legalTab, setLegalTab] = useState<'privacy' | 'terms' | 'data' | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const path = window.location.pathname.toLowerCase();
+    const search = window.location.search.toLowerCase();
+    if (path === '/privacy' || path === '/privacy-policy' || search.includes('privacy')) return 'privacy';
+    if (path === '/terms' || path === '/terms-of-service' || search.includes('terms')) return 'terms';
+    if (path === '/data' || path === '/data-policy' || search.includes('data')) return 'data';
+    return null;
+  });
 
   // Notification Scheduling & Alerts
   const [activeAlerts, setActiveAlerts] = useState<InAppAlert[]>([]);
@@ -203,10 +212,23 @@ export default function App() {
     };
 
     const handlePopState = () => {
+      const path = window.location.pathname.toLowerCase();
+      const search = window.location.search.toLowerCase();
       setShowPricing(
-        window.location.pathname === '/pricing' ||
-          window.location.pathname === '/subscription'
+        path === '/pricing' ||
+          path === '/subscription' ||
+          search.includes('pricing') ||
+          search.includes('subscription')
       );
+      if (path === '/privacy' || path === '/privacy-policy' || search.includes('privacy')) {
+        setLegalTab('privacy');
+      } else if (path === '/terms' || path === '/terms-of-service' || search.includes('terms')) {
+        setLegalTab('terms');
+      } else if (path === '/data' || path === '/data-policy' || search.includes('data')) {
+        setLegalTab('data');
+      } else {
+        setLegalTab(null);
+      }
     };
 
     window.addEventListener('online', handleOnline);
@@ -606,22 +628,31 @@ export default function App() {
     return remainingPending.length === 0;
   }, [selectedSession, selectedInstallment]);
 
-  // If user navigated to SaaS landing page view
-  if (showLanding) {
+  // 1. Dedicated Legal & Privacy Policy Page View (accessible without login)
+  if (legalTab !== null) {
     return (
-      <LandingPage
-        language={settings.language}
-        onStartApp={() => setShowLanding(false)}
+      <PrivacyPolicyPage
+        activeTab={legalTab}
+        onBack={() => {
+          setLegalTab(null);
+          if (
+            window.location.pathname === '/privacy' ||
+            window.location.pathname === '/privacy-policy' ||
+            window.location.pathname === '/terms' ||
+            window.location.pathname === '/data'
+          ) {
+            window.history.pushState({}, '', '/');
+          }
+        }}
         onOpenAuth={() => {
-          setShowLanding(false);
+          setLegalTab(null);
           setIsAuthOpen(true);
         }}
-        onOpenLegal={(tab) => setLegalTab(tab)}
       />
     );
   }
 
-  // If user navigated to Dedicated Pro Subscription & Pricing view (PRD Section 3)
+  // 2. Dedicated Pro Subscription & Pricing view (accessible without login)
   if (showPricing) {
     return (
       <SubscriptionScreen
@@ -647,14 +678,54 @@ export default function App() {
     );
   }
 
-  // Strict Google Authentication Gate: if user is not logged in with Google,
-  // do not open the dashboard. Show the Google Verification Gate until verified.
+  // 3. If user is NOT logged in:
   if (!user) {
+    // If user clicked "Sign In" or "Launch Dashboard", show Google Auth Gate
+    if (isAuthOpen) {
+      return (
+        <GoogleAuthGate
+          language={settings.language}
+          onSuccess={handleGoogleSuccess}
+          onLanguageChange={handleLanguageChange}
+          onBackToLanding={() => setIsAuthOpen(false)}
+          onOpenLegal={(tab) => {
+            setLegalTab(tab);
+            window.history.pushState({}, '', `/${tab}`);
+          }}
+        />
+      );
+    }
+
+    // Default: Public Landing Page / Homepage (Accessible without login for Google OAuth review & visitors)
     return (
-      <GoogleAuthGate
+      <LandingPage
         language={settings.language}
-        onSuccess={handleGoogleSuccess}
-        onLanguageChange={handleLanguageChange}
+        onStartApp={() => setIsAuthOpen(true)}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenLegal={(tab) => {
+          setLegalTab(tab);
+          window.history.pushState({}, '', `/${tab}`);
+        }}
+        onOpenPricing={() => {
+          setShowPricing(true);
+          window.history.pushState({}, '', '/subscription');
+        }}
+      />
+    );
+  }
+
+  // 4. If logged in and user navigated to Landing Page:
+  if (showLanding) {
+    return (
+      <LandingPage
+        language={settings.language}
+        onStartApp={() => setShowLanding(false)}
+        onOpenAuth={() => setShowLanding(false)}
+        onOpenLegal={(tab) => setLegalTab(tab)}
+        onOpenPricing={() => {
+          setShowLanding(false);
+          setShowPricing(true);
+        }}
       />
     );
   }
