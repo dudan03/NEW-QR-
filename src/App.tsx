@@ -34,6 +34,7 @@ import { SubscriptionScreen } from './screens/SubscriptionScreen';
 import { LandingPage } from './components/LandingPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { CreatePaymentModal } from './components/CreatePaymentModal';
+import { EditSessionModal } from './components/EditSessionModal';
 import { ManualConfirmModal } from './components/ManualConfirmModal';
 import { PaymentDetailModal } from './components/PaymentDetailModal';
 import { ReceiptModal } from './components/ReceiptModal';
@@ -49,7 +50,7 @@ import { SecurityArchitectureModal } from './components/SecurityArchitectureModa
 import { GoogleAuthGate } from './components/GoogleAuthGate';
 import { useInactivityTimeout } from './hooks/useInactivityTimeout';
 import { logoutFirebaseUser } from './services/firebaseAuth';
-import { Lock, ShieldAlert } from 'lucide-react';
+import { Lock, ShieldAlert, Plus } from 'lucide-react';
 
 export default function App() {
   // Core application state
@@ -84,6 +85,8 @@ export default function App() {
 
   // Interactive Modals
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [sessionToEdit, setSessionToEdit] = useState<PaymentSession | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -384,7 +387,7 @@ export default function App() {
         StorageService.saveDailyUsage(res.usage);
       }
     } catch (err: any) {
-      if (err.code === 'FREE_DAILY_LIMIT_REACHED' || err.status === 429) {
+      if (err.code === 'FREE_DAILY_LIMIT_REACHED' || err.status === 429 || err.code === 'AMOUNT_LIMIT_EXCEEDED' || err.status === 403) {
         if (err.usage) {
           setDailyUsage(err.usage);
           StorageService.saveDailyUsage(err.usage);
@@ -395,6 +398,19 @@ export default function App() {
         return;
       }
       console.warn('Server sync error during session creation, fallback to local:', err);
+    }
+
+    // Set entered UPI ID and Payee Name as default in merchant profile
+    if (newSession.upiId) {
+      const currentProf = StorageService.getProfile();
+      const updatedProfile: BusinessProfile = {
+        ...currentProf,
+        upiId: newSession.upiId,
+        displayName: newSession.payeeName || currentProf.displayName || currentProf.businessName,
+        businessName: currentProf.businessName || newSession.payeeName || currentProf.displayName,
+      };
+      setProfile(updatedProfile);
+      StorageService.saveProfile(updatedProfile);
     }
 
     if (customerRef) {
@@ -467,6 +483,29 @@ export default function App() {
 
     refreshAllData();
     setSelectedSession(sess);
+    triggerSync();
+  };
+
+  // Handler: Edit payment session
+  const handleOpenEditSession = (session: PaymentSession) => {
+    setSessionToEdit(session);
+    setIsEditOpen(true);
+  };
+
+  const handleSaveEditedSession = (updatedSession: PaymentSession, updatedCustomer?: Customer) => {
+    if (updatedCustomer) {
+      StorageService.saveCustomer(updatedCustomer);
+    }
+    StorageService.saveSession(updatedSession);
+    StorageService.recordAuditEvent({
+      sessionId: updatedSession.id,
+      newState: updatedSession.status,
+      note: 'Payment session details edited by merchant',
+    });
+    refreshAllData();
+    setSelectedSession(updatedSession);
+    setIsEditOpen(false);
+    setSessionToEdit(null);
     triggerSync();
   };
 
@@ -717,7 +756,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors relative">
       {/* Offline Alert Banner */}
       <OfflineIndicator />
 
@@ -795,8 +834,8 @@ export default function App() {
         onRequestPushPermission={handleRequestPushPermission}
       />
 
-      {/* Main Content Viewport */}
-      <main className="grow max-w-4xl w-full mx-auto px-3 sm:px-4 pt-3 pb-24">
+      {/* Main Content Viewport with safe-area spacing */}
+      <main className="grow max-w-4xl w-full mx-auto px-3 sm:px-4 pt-3 pb-[calc(6rem+env(safe-area-inset-bottom,0px))]">
         {activeTab === 'home' && (
           <HomeScreen
             sessions={sessions}
@@ -833,6 +872,7 @@ export default function App() {
               setInitialCustomerForPayment(null);
               setIsCreateOpen(true);
             }}
+            onOpenEdit={handleOpenEditSession}
             onMarkReceived={(inst, sess) => handleStartManualConfirm(inst, sess)}
             onOpenDetail={(sess) => {
               setSelectedSession(sess);
@@ -913,6 +953,20 @@ export default function App() {
         )}
       </main>
 
+      {/* Mobile Floating Action Button (FAB) for instant payment creation */}
+      <button
+        type="button"
+        onClick={() => {
+          setInitialCustomerForPayment(null);
+          setIsCreateOpen(true);
+        }}
+        className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] right-4 z-30 sm:hidden w-13 h-13 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-90 text-white shadow-xl shadow-blue-600/35 flex items-center justify-center transition-all cursor-pointer border border-blue-400/30"
+        title="Create New Payment"
+        aria-label="Create New Payment"
+      >
+        <Plus className="w-6 h-6 stroke-[2.5]" />
+      </button>
+
       {/* Fixed Bottom Navigation */}
       <BottomNav
         activeTab={activeTab}
@@ -961,6 +1015,7 @@ export default function App() {
         auditEvents={auditEvents}
         language={settings.language}
         onClose={() => setIsDetailOpen(false)}
+        onOpenEdit={handleOpenEditSession}
         onSelectInstallmentQr={(sess, inst) => {
           setSelectedSession(sess);
           setSelectedInstallment(inst);
@@ -974,6 +1029,21 @@ export default function App() {
         }}
         onCancelSession={handleCancelSession}
       />
+
+      {/* Edit Payment Session Modal */}
+      {isEditOpen && sessionToEdit && (
+        <EditSessionModal
+          isOpen={isEditOpen}
+          session={sessionToEdit}
+          customers={customers}
+          language={settings.language}
+          onClose={() => {
+            setIsEditOpen(false);
+            setSessionToEdit(null);
+          }}
+          onSave={handleSaveEditedSession}
+        />
+      )}
 
       {/* Printable / Downloadable Merchant Receipt Modal */}
       <ReceiptModal

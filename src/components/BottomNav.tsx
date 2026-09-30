@@ -29,8 +29,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 transition-colors">
-      <div className="max-w-xl mx-auto grid grid-cols-5 h-16 items-center px-1">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 transition-colors pb-[env(safe-area-inset-bottom,0px)] shadow-lg shadow-slate-900/5 w-full max-w-full overflow-hidden">
+      <div className="w-full max-w-md mx-auto grid grid-cols-5 h-16 items-center px-1">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -40,8 +40,11 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               key={tab.id}
               type="button"
               onClick={() => onTabChange(tab.id)}
-              className="relative min-h-[48px] flex flex-col items-center justify-center rounded-xl transition-all"
+              className="relative min-h-[50px] flex flex-col items-center justify-center rounded-xl transition-all active:scale-95 cursor-pointer"
             >
+              {isActive && (
+                <span className="absolute top-1 w-6 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />
+              )}
               <div
                 className={`relative p-1 rounded-lg transition-transform ${
                   isActive
@@ -51,16 +54,16 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               >
                 <Icon className="w-5 h-5" />
                 {tab.id === 'payments' && pendingCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-xs">
                     {pendingCount}
                   </span>
                 )}
               </div>
               <span
-                className={`text-[10px] font-semibold mt-0.5 tracking-tight transition-colors truncate max-w-full px-1 ${
+                className={`text-[10px] tracking-tight transition-colors truncate max-w-full px-1 ${
                   isActive
-                    ? 'text-blue-600 dark:text-blue-400 font-bold'
-                    : 'text-slate-500 dark:text-slate-400'
+                    ? 'text-blue-600 dark:text-blue-400 font-extrabold'
+                    : 'text-slate-500 dark:text-slate-400 font-medium'
                 }`}
               >
                 {tab.label}

@@ -229,6 +229,222 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </div>
 
+      {/* Subscription Indicator & Banner / Free Plan Usage Card (Moved to Top) */}
+      {isPro && subscription ? (
+        <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 dark:from-emerald-950/40 dark:to-teal-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold text-xs text-slate-900 dark:text-white">
+                  Split UPI QR Pro
+                </span>
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/80 dark:text-emerald-200 tracking-wide">
+                  ACTIVE
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
+                Expires: <strong>{formatCalendarDate(subscription.expiryDate)}</strong> · Unlimited sessions & cloud sync active
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+            <button
+              type="button"
+              onClick={onOpenCreate}
+              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1 cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Create Payment</span>
+            </button>
+            {onOpenPricing && (
+              <button
+                type="button"
+                onClick={onOpenPricing}
+                className="text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 dark:hover:text-emerald-200 flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800 shadow-2xs cursor-pointer"
+              >
+                <span>Manage</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+      ) : subscription && subscription.status === 'EXPIRED' ? (
+        <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold text-xs text-slate-900 dark:text-white">
+                  Split UPI QR Pro
+                </span>
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/80 dark:text-amber-200 tracking-wide">
+                  EXPIRED
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
+                Historical records are retained. Renew to resume unlimited sessions.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+            <button
+              type="button"
+              onClick={onOpenCreate}
+              className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1 cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Create Payment</span>
+            </button>
+            {onOpenPricing && (
+              <button
+                type="button"
+                onClick={onOpenPricing}
+                className="text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 active:scale-95 px-3.5 py-1.5 rounded-xl shadow-xs transition shrink-0 cursor-pointer"
+              >
+                Renew for ₹999 / 6 Months
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* Free Plan Usage Dashboard Card (PRD Section 4, 14 & 20) */
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 shadow-2xs">
+                <QrCode className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-extrabold text-sm text-slate-900 dark:text-white">
+                    Free Plan
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                    3 QR requests / day
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Today's QR Requests: <strong>{dailyUsage ? dailyUsage.used : 0} / 3 used</strong>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {dailyUsage && dailyUsage.used >= 3 ? (
+                onOpenPricing && (
+                  <button
+                    type="button"
+                    onClick={onOpenPricing}
+                    className="px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-95 text-white font-extrabold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Upgrade to Pro — ₹999</span>
+                  </button>
+                )
+              ) : (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={onOpenCreate}
+                    className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Create Payment</span>
+                  </button>
+                  {onOpenPricing && (
+                    <button
+                      type="button"
+                      onClick={onOpenPricing}
+                      className="px-3 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-xl transition cursor-pointer"
+                    >
+                      Get Pro
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Progress Indicator (PRD Section 4 & 14) */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center text-xs font-semibold">
+              <span
+                className={
+                  dailyUsage && dailyUsage.used >= 3
+                    ? 'text-amber-600 dark:text-amber-400 font-bold'
+                    : 'text-slate-600 dark:text-slate-300'
+                }
+              >
+                {dailyUsage && dailyUsage.used >= 3
+                  ? 'Daily free limit reached'
+                  : dailyUsage && dailyUsage.used === 2
+                  ? '1 QR request remaining today'
+                  : dailyUsage && dailyUsage.used === 1
+                  ? '2 QR requests remaining today'
+                  : '3 QR requests remaining today'}
+              </span>
+              <span className="font-mono text-slate-500">
+                {dailyUsage ? dailyUsage.used : 0} / 3
+              </span>
+            </div>
+
+            {/* Visual 3-Segment Progress Bar */}
+            <div className="grid grid-cols-3 gap-1.5 h-2.5">
+              {[1, 2, 3].map((slot) => {
+                const usedCount = dailyUsage ? dailyUsage.used : 0;
+                const isFilled = slot <= usedCount;
+                const isLimitReached = usedCount >= 3;
+                return (
+                  <div
+                    key={slot}
+                    className={`rounded-full transition-all duration-300 ${
+                      isFilled
+                        ? isLimitReached
+                          ? 'bg-amber-500'
+                          : 'bg-blue-600'
+                        : 'bg-slate-200 dark:bg-slate-800'
+                    }`}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Daily limit reached warning or notice */}
+          {dailyUsage && dailyUsage.used >= 3 ? (
+            <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600" />
+                <span>
+                  You've used all 3 free QR requests for today. Your allowance will reset tomorrow.
+                </span>
+              </div>
+              {onOpenPricing && (
+                <button
+                  type="button"
+                  onClick={onOpenPricing}
+                  className="text-amber-800 dark:text-amber-300 font-bold hover:underline self-start sm:self-auto shrink-0"
+                >
+                  Upgrade to Pro (₹999 / 6 Months) →
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+              <span>
+                QR Generated ≠ Payment Received. Always verify credits independently in your bank or UPI app.
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Top 3 Quick Financial Summary Cards (PRD Financial Snapshot) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
         {/* Card 1: Total Received */}
@@ -541,202 +757,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       ) : (
         /* NORMAL DASHBOARD VIEW (WHEN NOT SEARCHING) */
         <>
-          {/* Subscription Indicator & Banner (PRD Section 13 & 19) */}
-          {isPro && subscription ? (
-            <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 dark:from-emerald-950/40 dark:to-teal-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <CheckCircle2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-xs text-slate-900 dark:text-white">
-                      Split UPI QR Pro
-                    </span>
-                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/80 dark:text-emerald-200 tracking-wide">
-                      ACTIVE
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
-                    Expires: <strong>{formatCalendarDate(subscription.expiryDate)}</strong> · Unlimited sessions & cloud sync active
-                  </p>
-                </div>
-              </div>
-              {onOpenPricing && (
-                <button
-                  type="button"
-                  onClick={onOpenPricing}
-                  className="text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 dark:hover:text-emerald-200 flex items-center gap-1 shrink-0 self-start sm:self-center px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800 shadow-2xs cursor-pointer"
-                >
-                  <span>Manage Subscription</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-          ) : subscription && subscription.status === 'EXPIRED' ? (
-            <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <AlertTriangle className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-xs text-slate-900 dark:text-white">
-                      Split UPI QR Pro
-                    </span>
-                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/80 dark:text-amber-200 tracking-wide">
-                      EXPIRED
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
-                    Historical records are retained. Renew to resume unlimited sessions.
-                  </p>
-                </div>
-              </div>
-              {onOpenPricing && (
-                <button
-                  type="button"
-                  onClick={onOpenPricing}
-                  className="text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 active:scale-95 px-3.5 py-1.5 rounded-xl shadow-xs transition shrink-0 self-start sm:self-center cursor-pointer"
-                >
-                  Renew for ₹999 / 6 Months
-                </button>
-              )}
-            </div>
-          ) : (
-            /* Free Plan Usage Dashboard Card (PRD Section 4, 14 & 20) */
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3.5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 shadow-2xs">
-                    <QrCode className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-sm text-slate-900 dark:text-white">
-                        Free Plan
-                      </span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                        3 QR requests / day
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Today's QR Requests: <strong>{dailyUsage ? dailyUsage.used : 0} / 3 used</strong>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {dailyUsage && dailyUsage.used >= 3 ? (
-                    onOpenPricing && (
-                      <button
-                        type="button"
-                        onClick={onOpenPricing}
-                        className="px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-95 text-white font-extrabold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                        <span>Upgrade to Pro — ₹999</span>
-                      </button>
-                    )
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={onOpenCreate}
-                        className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1 cursor-pointer"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>Create Payment</span>
-                      </button>
-                      {onOpenPricing && (
-                        <button
-                          type="button"
-                          onClick={onOpenPricing}
-                          className="px-3 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-xl transition cursor-pointer"
-                        >
-                          Get Pro
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Progress Indicator (PRD Section 4 & 14) */}
-              <div className="space-y-1.5">
-                <div className="flex justify-between items-center text-xs font-semibold">
-                  <span
-                    className={
-                      dailyUsage && dailyUsage.used >= 3
-                        ? 'text-amber-600 dark:text-amber-400 font-bold'
-                        : 'text-slate-600 dark:text-slate-300'
-                    }
-                  >
-                    {dailyUsage && dailyUsage.used >= 3
-                      ? 'Daily free limit reached'
-                      : dailyUsage && dailyUsage.used === 2
-                      ? '1 QR request remaining today'
-                      : dailyUsage && dailyUsage.used === 1
-                      ? '2 QR requests remaining today'
-                      : '3 QR requests remaining today'}
-                  </span>
-                  <span className="font-mono text-slate-500">
-                    {dailyUsage ? dailyUsage.used : 0} / 3
-                  </span>
-                </div>
-
-                {/* Visual 3-Segment Progress Bar */}
-                <div className="grid grid-cols-3 gap-1.5 h-2.5">
-                  {[1, 2, 3].map((slot) => {
-                    const usedCount = dailyUsage ? dailyUsage.used : 0;
-                    const isFilled = slot <= usedCount;
-                    const isLimitReached = usedCount >= 3;
-                    return (
-                      <div
-                        key={slot}
-                        className={`rounded-full transition-all duration-300 ${
-                          isFilled
-                            ? isLimitReached
-                              ? 'bg-amber-500'
-                              : 'bg-blue-600'
-                            : 'bg-slate-200 dark:bg-slate-800'
-                        }`}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Daily limit reached warning or notice */}
-              {dailyUsage && dailyUsage.used >= 3 ? (
-                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
-                    <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600" />
-                    <span>
-                      You've used all 3 free QR requests for today. Your allowance will reset tomorrow.
-                    </span>
-                  </div>
-                  {onOpenPricing && (
-                    <button
-                      type="button"
-                      onClick={onOpenPricing}
-                      className="text-amber-800 dark:text-amber-300 font-bold hover:underline self-start sm:self-auto shrink-0"
-                    >
-                      Upgrade to Pro (₹999 / 6 Months) →
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                  <span>
-                    QR Generated ≠ Payment Received. Always verify credits independently in your bank or UPI app.
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Dashboard Metrics Grid (PRD Section 9 & 25) */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {/* Today's Confirmed Amount Card */}

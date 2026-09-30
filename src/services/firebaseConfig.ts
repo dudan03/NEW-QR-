@@ -12,16 +12,31 @@ export const firebaseConfig = {
 };
 
 // Check if valid production Firebase API key is configured
+const isPlaceholderKey = (key: string): boolean => {
+  if (!key) return true;
+  const k = key.trim().toLowerCase();
+  return (
+    k.length < 30 ||
+    k.includes('your') ||
+    k.includes('placeholder') ||
+    k.includes('clientapi') ||
+    k.includes('example') ||
+    k.includes('fake') ||
+    k.includes('undefined') ||
+    k === 'aizasyyourclientapikey'
+  );
+};
+
 const hasValidApiKey = Boolean(
   firebaseConfig.apiKey &&
-  firebaseConfig.apiKey.trim().length >= 20 &&
-  !firebaseConfig.apiKey.includes('YOUR_') &&
-  !firebaseConfig.apiKey.includes('placeholder') &&
-  !firebaseConfig.apiKey.includes('undefined')
+  !isPlaceholderKey(firebaseConfig.apiKey)
 );
 
 export const isFirebaseConfigured = Boolean(
-  hasValidApiKey && firebaseConfig.projectId
+  hasValidApiKey &&
+  firebaseConfig.projectId &&
+  !firebaseConfig.projectId.includes('placeholder') &&
+  !firebaseConfig.projectId.includes('example')
 );
 
 let appInstance: FirebaseApp | null = null;
@@ -33,8 +48,11 @@ if (isFirebaseConfigured) {
     appInstance = getApps().length ? getApp() : initializeApp(firebaseConfig);
     authInstance = getAuth(appInstance);
     dbInstance = getFirestore(appInstance);
-  } catch (err) {
-    console.warn("[Firebase] Initialization safely bypassed due to invalid credentials:", err);
+  } catch {
+    // If initialization fails due to credentials, fallback safely to local storage mode
+    appInstance = null;
+    authInstance = null;
+    dbInstance = null;
   }
 }
 

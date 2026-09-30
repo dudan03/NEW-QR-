@@ -62,30 +62,30 @@ export const TopBar: React.FC<TopBarProps> = ({
   const t = translations[language];
 
   return (
-    <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-2">
+    <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors w-full overflow-hidden">
+      <div className="max-w-6xl mx-auto px-2.5 sm:px-4 h-14 flex items-center justify-between gap-1.5 sm:gap-2">
         {/* Brand title */}
         <div
           onClick={onOpenLanding}
-          className="flex items-center gap-2 cursor-pointer select-none shrink-0"
+          className="flex items-center gap-1.5 sm:gap-2 cursor-pointer select-none shrink-0"
           title="View Landing Page"
         >
-          <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs">
+          <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs shrink-0">
             <QrCode className="w-4 h-4" />
           </div>
-          <div>
-            <h1 className="text-sm sm:text-base font-black tracking-tight text-slate-900 dark:text-white leading-none">
+          <div className="min-w-0">
+            <h1 className="text-sm sm:text-base font-black tracking-tight text-slate-900 dark:text-white leading-none whitespace-nowrap">
               Split UPI <span className="text-blue-600">QR</span>
             </h1>
-            <p className="text-[10px] text-slate-400 font-medium hidden sm:block">
+            <p className="text-[10px] text-slate-400 font-medium hidden sm:block truncate">
               {t.tagline}
             </p>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Cloud Sync Quick Pill */}
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          {/* Cloud Sync Quick Pill (Desktop/Tablet only) */}
           <button
             type="button"
             onClick={onSyncNow}
@@ -98,7 +98,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 ? 'Offline. Changes stored locally.'
                 : 'Sync pending'
             }
-            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition"
+            className="hidden md:flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition"
           >
             {syncStatus === 'syncing' ? (
               <RefreshCw className="w-3 h-3 text-blue-500 animate-spin" />
@@ -109,7 +109,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             ) : (
               <AlertTriangle className="w-3 h-3 text-amber-500" />
             )}
-            <span className="hidden md:inline font-mono">
+            <span className="font-mono">
               {syncStatus === 'synced'
                 ? 'Synced'
                 : syncStatus === 'syncing'
@@ -120,37 +120,38 @@ export const TopBar: React.FC<TopBarProps> = ({
             </span>
           </button>
 
-          {/* PWA Install Button */}
+          {/* PWA Install Button (Desktop/Tablet) */}
           <div className="hidden sm:block">
             <PWAInstallButton variant="compact" />
           </div>
 
-          {/* Pro Status Badge / Free Usage Indicator & Upgrade Button */}
+          {/* Pro Status Badge / Upgrade Button */}
           {isPro ? (
             <button
               type="button"
               onClick={onOpenPricing}
-              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-[11px] font-black text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 transition shadow-2xs cursor-pointer"
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-[10px] font-black text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 transition shadow-2xs cursor-pointer shrink-0"
               title="Split UPI QR Pro Active. Click to view subscription."
             >
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               <span>PRO</span>
             </button>
           ) : (
-            <div className="flex items-center gap-1.5">
-              {/* Mobile/Desktop Free Usage Badge (PRD Section 21) */}
+            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+              {/* Desktop Free Usage Counter */}
               <button
                 type="button"
                 onClick={onOpenPricing}
-                className="flex items-center gap-1 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 text-[11px] font-bold hover:bg-slate-200 transition shadow-2xs cursor-pointer"
-                title={`Free Plan: ${dailyUsage ? dailyUsage.used : 0} of 4 QR requests used today. Click to view details.`}
+                className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 text-[11px] font-bold hover:bg-slate-200 transition shadow-2xs cursor-pointer"
+                title={`Free Plan: ${dailyUsage ? dailyUsage.used : 0} of 3 QR requests used today.`}
               >
                 <span className="text-slate-500 font-medium">Free</span>
-                <span className={dailyUsage && dailyUsage.used >= 4 ? 'text-amber-600 font-black' : 'text-blue-600 dark:text-blue-400 font-black'}>
-                  · {dailyUsage ? dailyUsage.used : 0}/4
+                <span className={dailyUsage && dailyUsage.used >= 3 ? 'text-amber-600 font-black' : 'text-blue-600 dark:text-blue-400 font-black'}>
+                  · {dailyUsage ? dailyUsage.used : 0}/3
                 </span>
               </button>
 
+              {/* Upgrade Button */}
               <button
                 type="button"
                 onClick={onOpenPricing}
@@ -164,23 +165,23 @@ export const TopBar: React.FC<TopBarProps> = ({
             </div>
           )}
 
-          {/* User Account & Login / Logout Action Group */}
+          {/* User Account / Avatar */}
           {user ? (
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl">
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl shrink-0">
               <button
                 type="button"
                 onClick={onOpenAuth}
-                className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 transition cursor-pointer"
+                className="flex items-center gap-1.5 p-1 sm:px-2 sm:py-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 transition cursor-pointer"
                 title={`Logged in as ${user.email}. Click to view account info.`}
               >
                 {user.picture ? (
                   <img
                     src={user.picture}
                     alt={user.name}
-                    className="w-4 h-4 rounded-full object-cover"
+                    className="w-5 h-5 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-4 h-4 rounded-full bg-blue-600 text-white text-[9px] font-bold flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-blue-600 text-white text-[9px] font-bold flex items-center justify-center">
                     {user.name.charAt(0)}
                   </div>
                 )}
@@ -195,7 +196,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       onLogout();
                     }
                   }}
-                  className="flex items-center gap-1 px-2 py-1 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-[11px] font-bold transition cursor-pointer"
+                  className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-[11px] font-bold transition cursor-pointer"
                   title="Log out from session"
                 >
                   <LogOut className="w-3.5 h-3.5" />
@@ -207,19 +208,32 @@ export const TopBar: React.FC<TopBarProps> = ({
             <button
               type="button"
               onClick={onOpenAuth}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition cursor-pointer"
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition cursor-pointer shrink-0"
             >
               <LogIn className="w-3.5 h-3.5" />
               <span>Login</span>
             </button>
           )}
 
-          {/* Language Selector */}
-          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg text-xs font-semibold">
+          {/* Mobile Language Switcher (1-tap cycle) */}
+          <button
+            type="button"
+            onClick={() => {
+              const nextLang = language === 'en' ? 'hi' : language === 'hi' ? 'or' : 'en';
+              onLanguageChange(nextLang);
+            }}
+            className="sm:hidden px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition shrink-0"
+            title="Switch Language"
+          >
+            {language === 'en' ? 'EN' : language === 'hi' ? 'हिं' : 'ଓଡ଼'}
+          </button>
+
+          {/* Desktop Language Selector */}
+          <div className="hidden sm:flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg text-xs font-semibold shrink-0">
             <button
               type="button"
               onClick={() => onLanguageChange('en')}
-              className={`px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-md transition-colors ${
+              className={`px-2 py-1 rounded-md transition-colors ${
                 language === 'en'
                   ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-xs font-bold'
                   : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-100'
@@ -230,7 +244,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             <button
               type="button"
               onClick={() => onLanguageChange('hi')}
-              className={`px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-md transition-colors ${
+              className={`px-2 py-1 rounded-md transition-colors ${
                 language === 'hi'
                   ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-xs font-bold'
                   : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-100'
@@ -241,7 +255,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             <button
               type="button"
               onClick={() => onLanguageChange('or')}
-              className={`px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-md transition-colors ${
+              className={`px-2 py-1 rounded-md transition-colors ${
                 language === 'or'
                   ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-xs font-bold'
                   : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-100'
@@ -256,23 +270,23 @@ export const TopBar: React.FC<TopBarProps> = ({
             <button
               type="button"
               onClick={onOpenNotifications}
-              className="relative w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="relative w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
               title="Due date alerts & notifications"
             >
               <Bell className="w-3.5 h-3.5" />
               {notificationCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-rose-600 text-white text-[9px] font-black flex items-center justify-center shadow-xs animate-pulse">
+                <span className="absolute -top-1 -right-1 min-w-[14px] h-3.5 px-0.5 rounded-full bg-rose-600 text-white text-[8px] font-black flex items-center justify-center shadow-xs animate-pulse">
                   {notificationCount > 9 ? '9+' : notificationCount}
                 </span>
               )}
             </button>
           )}
 
-          {/* Theme Toggle */}
+          {/* Theme Toggle (Desktop only — mobile uses Settings tab) */}
           <button
             type="button"
             onClick={onThemeToggle}
-            className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="hidden sm:flex w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
             title="Toggle theme"
           >
             {theme === 'dark' ? (
@@ -282,26 +296,26 @@ export const TopBar: React.FC<TopBarProps> = ({
             )}
           </button>
 
-          {/* Security Architecture Console Trigger */}
+          {/* Security Architecture Console Trigger (Desktop only) */}
           {onOpenSecurity && (
             <button
               type="button"
               onClick={onOpenSecurity}
-              className="w-8 h-8 rounded-lg border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors"
-              title="Security & Architecture Console (Firebase & Cloudflare)"
+              className="hidden md:flex w-8 h-8 rounded-lg border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 items-center justify-center text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors shrink-0"
+              title="Security & Architecture Console"
             >
               <ShieldCheck className="w-4 h-4" />
             </button>
           )}
 
-          {/* Primary CTA */}
+          {/* Primary CTA (Desktop only — mobile uses FAB button) */}
           <button
             type="button"
             onClick={onOpenCreate}
-            className="h-8 px-2.5 sm:px-3 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white text-xs font-bold rounded-lg transition-all shadow-xs flex items-center gap-1 shrink-0"
+            className="hidden sm:flex h-8 px-2.5 sm:px-3 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white text-xs font-bold rounded-lg transition-all shadow-xs items-center gap-1 shrink-0"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">New</span>
+            <span>New</span>
           </button>
         </div>
       </div>

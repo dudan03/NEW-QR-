@@ -15,6 +15,7 @@ import {
   Phone,
   User,
   Ban,
+  Edit3,
 } from 'lucide-react';
 
 interface PaymentDetailModalProps {
@@ -25,6 +26,7 @@ interface PaymentDetailModalProps {
   onClose: () => void;
   onSelectInstallmentQr: (session: PaymentSession, installment: Installment) => void;
   onOpenReceipt: (session: PaymentSession) => void;
+  onOpenEdit?: (session: PaymentSession) => void;
   onCancelSession?: (sessionId: string) => void;
 }
 
@@ -36,6 +38,7 @@ export const PaymentDetailModal: React.FC<PaymentDetailModalProps> = ({
   onClose,
   onSelectInstallmentQr,
   onOpenReceipt,
+  onOpenEdit,
   onCancelSession,
 }) => {
   const [activeTab, setActiveTab] = useState<'installments' | 'audit'>('installments');
@@ -351,10 +354,23 @@ export const PaymentDetailModal: React.FC<PaymentDetailModalProps> = ({
           )}
 
           <div className="flex items-center gap-2">
+            {onOpenEdit && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenEdit(session);
+                }}
+                className="h-10 px-3.5 text-xs font-semibold bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              >
+                <Edit3 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>Edit</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={() => onOpenReceipt(session)}
-              className="h-10 px-4 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm transition-all flex items-center gap-1.5"
+              className="h-10 px-4 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <FileText className="w-3.5 h-3.5" />
               <span>{t.receipt.subtitle}</span>

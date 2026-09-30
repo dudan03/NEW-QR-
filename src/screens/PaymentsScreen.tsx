@@ -14,6 +14,7 @@ import {
   FileText,
   AlertCircle,
   AlertTriangle,
+  Edit3,
 } from 'lucide-react';
 
 interface PaymentsScreenProps {
@@ -22,6 +23,7 @@ interface PaymentsScreenProps {
   selectedSessionId?: string;
   selectedInstallmentId?: string;
   onOpenCreate: () => void;
+  onOpenEdit?: (session: PaymentSession) => void;
   onMarkReceived: (installment: Installment, session: PaymentSession) => void;
   onOpenDetail: (session: PaymentSession) => void;
   onOpenReceipt: (session: PaymentSession) => void;
@@ -33,6 +35,7 @@ export const PaymentsScreen: React.FC<PaymentsScreenProps> = ({
   selectedSessionId: propSessionId,
   selectedInstallmentId: propInstallmentId,
   onOpenCreate,
+  onOpenEdit,
   onMarkReceived,
   onOpenDetail,
   onOpenReceipt,
@@ -122,7 +125,7 @@ export const PaymentsScreen: React.FC<PaymentsScreenProps> = ({
       ) : (
         <div className="space-y-4">
           {/* Session Switcher Pills / Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none w-full max-w-full">
             {sessions.map((sess) => {
               const isSelected = sess.id === currentSession?.id;
               const isDone = sess.status === 'COMPLETED';
@@ -170,7 +173,7 @@ export const PaymentsScreen: React.FC<PaymentsScreenProps> = ({
           {currentSession && (() => {
             const currentSessionOverdue = getSessionOverdueStats(currentSession);
             return (
-              <div className={`p-3 rounded-xl border flex items-center justify-between text-xs ${
+              <div className={`p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs ${
                 currentSessionOverdue.hasOverdue
                   ? 'bg-rose-50/40 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/60 border-l-4 border-l-rose-500'
                   : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800'
@@ -212,18 +215,29 @@ export const PaymentsScreen: React.FC<PaymentsScreenProps> = ({
                     </div>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
+                  {onOpenEdit && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenEdit(currentSession)}
+                      className="px-2.5 py-1 text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1 shadow-2xs cursor-pointer transition"
+                      title="Edit Session Details"
+                    >
+                      <Edit3 className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                      <span>Edit</span>
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => onOpenDetail(currentSession)}
-                    className="px-2.5 py-1 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-xs font-medium"
+                    className="px-2.5 py-1 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-xs font-medium cursor-pointer"
                   >
                     Details
                   </button>
                   <button
                     type="button"
                     onClick={() => onOpenReceipt(currentSession)}
-                    className="px-2.5 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-800 dark:text-slate-200 text-xs font-semibold flex items-center gap-1 shadow-xs"
+                    className="px-2.5 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-800 dark:text-slate-200 text-xs font-semibold flex items-center gap-1 shadow-xs cursor-pointer"
                   >
                     <FileText className="w-3 h-3" />
                     Receipt

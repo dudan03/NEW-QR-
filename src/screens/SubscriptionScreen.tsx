@@ -575,6 +575,17 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 <td className="py-3 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-blue-50/20 dark:bg-blue-950/10">Unlimited</td>
               </tr>
               <tr>
+                <td className="py-3 px-4 font-semibold text-slate-800 dark:text-slate-200">Bill Transaction Amount Limit</td>
+                <td className="py-3 px-4 text-center text-slate-600 dark:text-slate-400 leading-snug">
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">1st QR: No Limit</span>
+                  <span className="block text-[10px] text-slate-500">2nd & 3rd QR: Max ₹5,000</span>
+                </td>
+                <td className="py-3 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-blue-50/20 dark:bg-blue-950/10 leading-snug">
+                  <span>Unlimited</span>
+                  <span className="block text-[10px] font-normal text-emerald-700 dark:text-emerald-300">Any bill amount with no cap</span>
+                </td>
+              </tr>
+              <tr>
                 <td className="py-3 px-4 font-semibold text-slate-800 dark:text-slate-200">Payment Splitting (2 to 12 Parts)</td>
                 <td className="py-3 px-4 text-center text-emerald-600">✓ Included</td>
                 <td className="py-3 px-4 text-center text-emerald-600 font-bold bg-blue-50/20 dark:bg-blue-950/10">✓ Included</td>

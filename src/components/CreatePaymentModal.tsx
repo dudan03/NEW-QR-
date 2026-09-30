@@ -31,13 +31,10 @@ import {
   Calculator,
   User,
   Phone,
-  Sparkles,
   AlertTriangle,
-  Tag,
-  Wand2,
-  Loader2,
+  CheckCircle2,
 } from 'lucide-react';
-import { ApiService } from '../services/api';
+import { StorageService } from '../services/storage';
 
 interface CreatePaymentModalProps {
   isOpen: boolean;
@@ -68,26 +65,14 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
 }) => {
   const t = translations[language];
 
-  // Form states
-  const [upiId, setUpiId] = useState(merchantProfile.upiId || '');
-  const [payeeName, setPayeeName] = useState(merchantProfile.displayName || merchantProfile.businessName || '');
+  // Form states (Pre-fills from profile or storage default)
+  const [upiId, setUpiId] = useState(() => merchantProfile.upiId || StorageService.getProfile().upiId || '');
+  const [payeeName, setPayeeName] = useState(() => merchantProfile.displayName || merchantProfile.businessName || StorageService.getProfile().displayName || StorageService.getProfile().businessName || '');
   const [totalAmountStr, setTotalAmountStr] = useState('');
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>(initialCustomer?.id || '');
   const [customerName, setCustomerName] = useState(initialCustomer?.name || '');
   const [customerPhone, setCustomerPhone] = useState(initialCustomer?.phone || '');
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState<string>('Retail');
-  const [tags, setTags] = useState<string[]>(['Retail', 'Installment']);
-  const [newTagInput, setNewTagInput] = useState('');
-  const [isAiCategorizing, setIsAiCategorizing] = useState(false);
-  const [aiSuggestions, setAiSuggestions] = useState<string[]>([
-    'Retail',
-    'Service',
-    'Freelance',
-    'Electronics',
-    'Consulting',
-  ]);
-  const [aiReason, setAiReason] = useState<string | null>(null);
   const [invoiceId, setInvoiceId] = useState('');
   const [notes, setNotes] = useState('');
   const [splitMethod, setSplitMethod] = useState<SplitMethod>('EQUAL');
@@ -101,8 +86,8 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
   // Custom split params (stored as string inputs for easy user typing)
   const [customAmounts, setCustomAmounts] = useState<string[]>(['3000', '2000', '5000']);
 
-  // Installment schedule
-  const [dueSchedule, setDueSchedule] = useState<'none' | 'weekly' | 'biweekly' | 'monthly'>('weekly');
+  // Installment schedule (Default: No Schedule)
+  const [dueSchedule, setDueSchedule] = useState<'none' | 'weekly' | 'biweekly' | 'monthly'>('none');
 
   // Validation errors
   const [errors, setErrors] = useState<{
@@ -115,13 +100,20 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
   }>({});
 
   useEffect(() => {
-    if (merchantProfile.upiId) {
-      setUpiId(merchantProfile.upiId);
+    const currentProf = StorageService.getProfile();
+    const defaultUpi = merchantProfile.upiId || currentProf.upiId;
+    if (defaultUpi && !upiId) {
+      setUpiId(defaultUpi);
     }
-    if (merchantProfile.displayName || merchantProfile.businessName) {
-      setPayeeName(merchantProfile.displayName || merchantProfile.businessName);
+    const defaultName =
+      merchantProfile.displayName ||
+      merchantProfile.businessName ||
+      currentProf.displayName ||
+      currentProf.businessName;
+    if (defaultName && !payeeName) {
+      setPayeeName(defaultName);
     }
-  }, [merchantProfile]);
+  }, [merchantProfile, isOpen]);
 
   useEffect(() => {
     if (initialCustomer) {
@@ -192,55 +184,6 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
     setCustomAmounts(next);
   };
 
-  // AI Auto-categorization handler (Gemini 3.8 Flash)
-  const handleAutoCategorize = async () => {
-    setIsAiCategorizing(true);
-    setAiReason(null);
-    try {
-      const res = await ApiService.categorizeSession(merchantProfile.userId || 'default-merchant', {
-        title: title.trim(),
-        notes: notes.trim(),
-        customerName: customerName.trim(),
-        amountPaise: totalPaise,
-      });
-
-      if (res.suggestedCategory) {
-        setCategory(res.suggestedCategory);
-      }
-      if (res.suggestedTags && res.suggestedTags.length > 0) {
-        setAiSuggestions(res.suggestedTags);
-        // Automatically merge suggested tags
-        const newSet = new Set([...tags, ...res.suggestedTags]);
-        setTags(Array.from(newSet));
-      }
-      if (res.reason) {
-        setAiReason(res.reason);
-      }
-    } catch (err) {
-      console.warn('AI categorization failed, using fallback:', err);
-    } finally {
-      setIsAiCategorizing(false);
-    }
-  };
-
-  const handleToggleTag = (tagToToggle: string) => {
-    if (tags.includes(tagToToggle)) {
-      setTags(tags.filter((t) => t !== tagToToggle));
-    } else {
-      setTags([...tags, tagToToggle]);
-    }
-  };
-
-  const handleAddCustomTag = (e: React.KeyboardEvent | React.MouseEvent) => {
-    if ('key' in e && e.key !== 'Enter') return;
-    e.preventDefault();
-    const trimmed = newTagInput.trim().replace(/^#/, '');
-    if (trimmed && !tags.includes(trimmed)) {
-      setTags([...tags, trimmed]);
-      setNewTagInput('');
-    }
-  };
-
   // Submission handler (Strict details required before scanner/QR opens)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -262,19 +205,36 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
       newErrors.payeeName = 'Merchant / Business name is required.';
     }
 
-    // 2. Customer Details Mandatory Validation
-    if (!customerName.trim()) {
-      newErrors.customerName = 'Customer name is required before generating QR codes.';
-    }
-
+    // 2. Customer Details Validation (Optional up to ₹5,000, Mandatory above ₹5,000)
+    const isCustomerMandatory = totalPaise > 500000;
     const cleanPhone = customerPhone.replace(/[^0-9]/g, '');
-    if (!customerPhone.trim() || cleanPhone.length < 10) {
-      newErrors.customerPhone = 'Valid 10-digit customer mobile number is required.';
+
+    if (isCustomerMandatory) {
+      if (!customerName.trim()) {
+        newErrors.customerName = 'Customer name is required for transactions above ₹5,000.';
+      }
+      if (!customerPhone.trim() || cleanPhone.length < 10) {
+        newErrors.customerPhone = 'Valid 10-digit mobile number is required for transactions above ₹5,000.';
+      }
+    } else {
+      // Optional up to ₹5,000 — only validate if user entered a number
+      if (customerPhone.trim() && cleanPhone.length < 10) {
+        newErrors.customerPhone = 'Enter a valid 10-digit mobile number, or leave blank.';
+      }
     }
 
     // 3. Amount & Split Validation
     if (totalPaise <= 0) {
       newErrors.totalAmount = t.form.totalAmountError || 'Please enter total bill amount greater than ₹0.';
+    }
+
+    // Free Plan Limit Rule:
+    // 1st QR of the day (used === 0): No limit on transaction amount.
+    // 2nd & 3rd QR of the day (used >= 1): Max ₹5,000 per transaction.
+    const isFreePlanSecondOrThird = !isPro && (dailyUsage ? dailyUsage.used >= 1 : false);
+    if (isFreePlanSecondOrThird && totalPaise > 500000) {
+      const qrOrdinal = (dailyUsage?.used || 0) === 1 ? '2nd' : '3rd';
+      newErrors.totalAmount = `Free Plan limit: Your ${qrOrdinal} QR today cannot exceed ₹5,000 (1st QR had no amount limit). Upgrade to Pro for unlimited transactions of any amount!`;
     }
 
     if (splitMethod === 'CUSTOM') {
@@ -364,8 +324,6 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
       payeeName: payeeName.trim() || undefined,
       totalAmountPaise: totalPaise,
       title: title.trim() || undefined,
-      category: category.trim() || undefined,
-      tags: tags.length > 0 ? tags : undefined,
       invoiceId: invoiceId.trim() || undefined,
       notes: notes.trim() || undefined,
       splitMethod,
@@ -376,12 +334,25 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
       updatedAt: nowIso,
     };
 
+    // Auto-save entered merchant UPI ID as default in profile
+    const currentProf = StorageService.getProfile();
+    const updatedProf: BusinessProfile = {
+      ...currentProf,
+      upiId: upiId.trim(),
+      displayName: payeeName.trim() || currentProf.displayName,
+      businessName: currentProf.businessName || payeeName.trim(),
+    };
+    StorageService.saveProfile(updatedProf);
+
     onCreated(newSession, customerRef);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150">
+      <div className="bg-white dark:bg-slate-900 border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-3xl sm:rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col pb-[env(safe-area-inset-bottom,0px)]">
+        {/* Mobile Drag Indicator */}
+        <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mt-2.5 mb-1 sm:hidden shrink-0" />
+
         {/* Top Modal Header */}
         <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
           <div>
@@ -451,38 +422,79 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
             {/* Scrollable Form Body */}
             <form onSubmit={handleSubmit} className="p-5 overflow-y-auto space-y-4 grow">
               {!isPro && (
-                <div className="p-2.5 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 rounded-xl text-xs flex items-center justify-between text-blue-900 dark:text-blue-200">
-                  <span className="font-semibold">
-                    Free Plan: <strong>{dailyUsage ? dailyUsage.remaining : 3} of 3</strong> QR requests remaining today
-                  </span>
-                  {onOpenPricing && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onClose();
-                        onOpenPricing();
-                      }}
-                      className="text-blue-600 dark:text-blue-400 font-bold hover:underline"
-                    >
-                      Get Unlimited Pro →
-                    </button>
-                  )}
+                <div className="p-3 bg-blue-50/90 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 rounded-xl text-xs space-y-1.5 text-blue-900 dark:text-blue-200">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold flex items-center gap-1.5">
+                      <span>Free Plan:</span>
+                      <span className="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 font-extrabold text-[11px]">
+                        {dailyUsage ? Math.min(3, dailyUsage.used + 1) : 1} of 3 QR Request Today
+                      </span>
+                    </span>
+                    {onOpenPricing && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onClose();
+                          onOpenPricing();
+                        }}
+                        className="text-blue-600 dark:text-blue-400 font-bold hover:underline flex items-center gap-0.5 text-xs"
+                      >
+                        <span>Upgrade to Pro</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="text-[11px] leading-relaxed">
+                    {(dailyUsage ? dailyUsage.used : 0) === 0 ? (
+                      <span className="text-emerald-700 dark:text-emerald-300 font-semibold flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span><strong>1st QR today:</strong> No transaction amount limit! Generate any amount.</span>
+                      </span>
+                    ) : (
+                      <span className="text-amber-800 dark:text-amber-300 font-semibold flex items-center gap-1">
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                        <span><strong>{(dailyUsage ? dailyUsage.used : 0) === 1 ? '2nd' : '3rd'} QR today:</strong> Max ₹5,000 transaction limit in Free Plan (Pro is unlimited).</span>
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
 
               {/* Merchant UPI ID & Payee */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    {t.form.upiIdLabel} <span className="text-rose-500 font-bold">*</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      {t.form.upiIdLabel} <span className="text-rose-500 font-bold">*</span>
+                    </label>
+                    {upiId.trim() && isValidUpiId(upiId.trim()) && (
+                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>Default UPI</span>
+                      </span>
+                    )}
+                  </div>
                   <input
                     type="text"
                     required
+                    inputMode="email"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
                     value={upiId}
                     onChange={(e) => {
-                      setUpiId(e.target.value);
+                      const val = e.target.value;
+                      setUpiId(val);
                       if (errors.upiId) setErrors({ ...errors, upiId: undefined });
+                      // Once a valid UPI ID is entered, immediately set as default
+                      const trimmed = val.trim();
+                      if (isValidUpiId(trimmed)) {
+                        const curr = StorageService.getProfile();
+                        StorageService.saveProfile({
+                          ...curr,
+                          upiId: trimmed,
+                        });
+                      }
                     }}
                     placeholder={t.form.upiIdPlaceholder}
                     className={`w-full h-10 px-3 text-xs font-mono rounded-xl border ${
@@ -525,13 +537,21 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
                 </div>
               </div>
 
-              {/* CRM Customer Details (Mandatory) */}
+              {/* CRM Customer Details (Optional up to ₹5,000, Mandatory above ₹5,000) */}
               <div className="p-3.5 bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 rounded-xl space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 flex-wrap">
                     <User className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Customer Details (Required for QR & Receipt)</span>
-                    <span className="text-rose-500 font-bold">*</span>
+                    <span>Customer Details</span>
+                    {totalPaise > 500000 ? (
+                      <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-1.5 py-0.5 rounded border border-rose-200 dark:border-rose-900/60">
+                        Mandatory above ₹5,000 *
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
+                        Optional up to ₹5,000
+                      </span>
+                    )}
                   </span>
                   {customers.length > 0 && (
                     <select
@@ -552,11 +572,10 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                      Customer Name <span className="text-rose-500">*</span>
+                      Customer Name {totalPaise > 500000 ? <span className="text-rose-500 font-bold">*</span> : <span className="text-slate-400 font-normal text-[10px]">(Optional)</span>}
                     </label>
                     <input
                       type="text"
-                      required
                       value={customerName}
                       onChange={(e) => {
                         setCustomerName(e.target.value);
@@ -578,11 +597,11 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
 
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                      Customer Mobile Phone <span className="text-rose-500">*</span>
+                      Customer Mobile Phone {totalPaise > 500000 ? <span className="text-rose-500 font-bold">*</span> : <span className="text-slate-400 font-normal text-[10px]">(Optional)</span>}
                     </label>
                     <input
                       type="tel"
-                      required
+                      inputMode="tel"
                       value={customerPhone}
                       onChange={(e) => {
                         setCustomerPhone(e.target.value);
@@ -617,11 +636,23 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
                     type="number"
                     min="1"
                     step="any"
+                    inputMode="decimal"
                     required
                     value={totalAmountStr}
                     onChange={(e) => {
-                      setTotalAmountStr(e.target.value);
-                      if (errors.totalAmount) setErrors({ ...errors, totalAmount: undefined });
+                      const val = e.target.value;
+                      setTotalAmountStr(val);
+                      const p = rupeesToPaise(val);
+                      if (p <= 500000) {
+                        setErrors((prev) => ({
+                          ...prev,
+                          customerName: undefined,
+                          customerPhone: prev.customerPhone?.includes('above ₹5,000') ? undefined : prev.customerPhone,
+                          totalAmount: undefined,
+                        }));
+                      } else {
+                        if (errors.totalAmount) setErrors((prev) => ({ ...prev, totalAmount: undefined }));
+                      }
                     }}
                     placeholder={t.form.totalAmountPlaceholder}
                     className={`w-full h-11 pl-8 pr-3 text-base font-bold tabular-nums rounded-xl border ${
@@ -635,6 +666,32 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
                   <span className="text-[11px] text-rose-500 mt-1 block font-medium">
                     {errors.totalAmount}
                   </span>
+                )}
+
+                {/* Free Plan 2nd & 3rd QR ₹5,000 Limit Notice */}
+                {!isPro && (dailyUsage ? dailyUsage.used >= 1 : false) && totalPaise > 500000 && (
+                  <div className="mt-2 p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl text-xs text-amber-900 dark:text-amber-200 space-y-1.5">
+                    <div className="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-300">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>Free Plan Limit: ₹5,000 Max for 2nd & 3rd QR</span>
+                    </div>
+                    <p className="text-[11px] text-amber-800/90 dark:text-amber-300/90 leading-relaxed">
+                      In the Free Plan, only your 1st QR of the day has no amount limit. 2nd and 3rd QR requests cannot exceed ₹5,000.
+                    </p>
+                    {onOpenPricing && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onClose();
+                          onOpenPricing();
+                        }}
+                        className="text-[11px] text-blue-600 dark:text-blue-400 font-bold hover:underline inline-flex items-center gap-1 pt-0.5"
+                      >
+                        <span>Upgrade to Pro for Unlimited Amount on All Bills</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
 
@@ -911,140 +968,6 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
               placeholder="e.g. Retail appliance purchase split into 4 installments"
               className="w-full h-9 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
-          </div>
-
-          {/* AI-Powered Auto-Categorization & Tagging (Gemini 3.8 Flash) */}
-          <div className="p-3.5 bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50 dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-slate-800/40 rounded-xl border border-blue-200/80 dark:border-blue-900/50 space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                </div>
-                <div>
-                  <span className="text-xs font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <span>AI Auto-Categorization</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded font-mono font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300">
-                      Gemini API
-                    </span>
-                  </span>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Suggests category and tags from title, notes, and merchant details
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleAutoCategorize}
-                disabled={isAiCategorizing}
-                className="self-start sm:self-auto px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
-              >
-                {isAiCategorizing ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>Analyzing...</span>
-                  </>
-                ) : (
-                  <>
-                    <Wand2 className="w-3.5 h-3.5 text-amber-300" />
-                    <span>Suggest Tags</span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* AI Explanation Banner if available */}
-            {aiReason && (
-              <div className="p-2 rounded-lg bg-white/80 dark:bg-slate-900/80 border border-blue-100 dark:border-blue-900/60 text-[11px] text-slate-600 dark:text-slate-300 flex items-start gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
-                <span>{aiReason}</span>
-              </div>
-            )}
-
-            {/* Category Selector */}
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-slate-600 dark:text-slate-400 font-semibold shrink-0">
-                Primary Category:
-              </span>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="text-xs px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold"
-              >
-                <option value="Retail">Retail</option>
-                <option value="Service">Service</option>
-                <option value="Freelance">Freelance</option>
-                <option value="Consulting">Consulting</option>
-                <option value="Wholesale">Wholesale</option>
-                <option value="Healthcare">Healthcare</option>
-                <option value="Education">Education</option>
-                <option value="Subscription">Subscription</option>
-                <option value="Hospitality">Hospitality</option>
-                <option value="Digital Goods">Digital Goods</option>
-              </select>
-            </div>
-
-            {/* Active & Suggested Tags */}
-            <div className="space-y-2">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 mr-1 flex items-center gap-1">
-                  <Tag className="w-3 h-3" />
-                  <span>Tags:</span>
-                </span>
-                {tags.map((t) => (
-                  <span
-                    key={t}
-                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/80 dark:text-blue-200 border border-blue-200 dark:border-blue-800 shadow-2xs"
-                  >
-                    <span>#{t}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleToggleTag(t)}
-                      className="hover:text-red-500 rounded-full cursor-pointer"
-                      title={`Remove tag #${t}`}
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-
-              {/* Suggestions quick chips */}
-              <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                <span className="text-[11px] text-slate-400">Suggestions:</span>
-                {aiSuggestions
-                  .filter((sug) => !tags.includes(sug))
-                  .map((sug) => (
-                    <button
-                      key={sug}
-                      type="button"
-                      onClick={() => handleToggleTag(sug)}
-                      className="px-2 py-0.5 rounded-full text-[11px] font-medium border border-dashed border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer"
-                    >
-                      + {sug}
-                    </button>
-                  ))}
-              </div>
-
-              {/* Custom tag input */}
-              <div className="flex items-center gap-1.5 pt-1">
-                <input
-                  type="text"
-                  value={newTagInput}
-                  onChange={(e) => setNewTagInput(e.target.value)}
-                  onKeyDown={handleAddCustomTag}
-                  placeholder="Add custom tag (e.g. #Electronics)"
-                  className="h-7 px-2.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white max-w-[200px]"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddCustomTag}
-                  className="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold cursor-pointer"
-                >
-                  Add Tag
-                </button>
-              </div>
-            </div>
           </div>
         </form>
 

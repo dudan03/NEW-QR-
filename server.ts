@@ -868,6 +868,24 @@ app.post('/api/sessions', (req, res) => {
         });
       }
 
+      // Free Plan Rule: 1st QR has no amount limit. 2nd and 3rd QR requests are limited to max ₹5,000.
+      const sessionAmountPaise = Number(session.totalAmountPaise) || 0;
+      if (currentUsage.qrRequestCount >= 1 && sessionAmountPaise > 500000) {
+        return res.status(403).json({
+          error: 'AMOUNT_LIMIT_EXCEEDED',
+          code: 'AMOUNT_LIMIT_EXCEEDED',
+          message: "In the Free Plan, only your 1st QR of the day has no amount limit. Your 2nd and 3rd QR requests are capped at ₹5,000. Upgrade to Pro for unlimited transactions of any amount!",
+          usage: {
+            used: currentUsage.qrRequestCount,
+            limit: 3,
+            remaining: Math.max(0, 3 - currentUsage.qrRequestCount),
+            date: today,
+            isPro: false,
+            plan: 'FREE',
+          },
+        });
+      }
+
       // Atomically increment usage
       currentUsage.qrRequestCount += 1;
       currentUsage.updatedAt = new Date().toISOString();
