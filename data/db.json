@@ -8,7 +8,7 @@
       "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces",
       "plan": "FREE",
       "createdAt": "2026-09-27T08:54:07.832Z",
-      "lastLoginAt": "2026-09-27T08:54:34.131Z",
+      "lastLoginAt": "2026-09-28T08:36:23.019Z",
       "businessId": "biz_1790499247832"
     }
   },
@@ -25,7 +25,7 @@
       "receiptFooter": "Thank you for your business! Merchant-generated payment record.",
       "currency": "INR",
       "language": "en",
-      "updatedAt": "2026-09-27T09:00:46.022Z",
+      "updatedAt": "2026-09-28T08:59:47.442Z",
       "userId": "usr_1790499247832_szwkj"
     },
     "biz_1790233437131": {
@@ -57,18 +57,30 @@
       "currency": "INR",
       "language": "en",
       "updatedAt": "2026-09-27T09:25:35.534Z"
+    },
+    "biz_1790540815289": {
+      "id": "biz_1790540815289",
+      "businessName": "Anshuman Parida's Business",
+      "displayName": "Anshuman Parida",
+      "upiId": "anshumanparida913@upi",
+      "phone": "+91 98765 43210",
+      "email": "anshumanparida913@gmail.com",
+      "address": "Bhubaneswar, Odisha, India",
+      "invoicePrefix": "INV",
+      "receiptFooter": "Thank you for your business! Merchant-generated payment record.",
+      "currency": "INR",
+      "language": "en",
+      "updatedAt": "2026-09-27T21:44:10.472Z",
+      "userId": "usr_1790499247832_szwkj"
     }
   },
   "customers": {
-    "cust-demo-rahul": {
-      "id": "cust-demo-rahul",
-      "name": "dudaan",
+    "cust_1790572004885_jmxx": {
+      "id": "cust_1790572004885_jmxx",
+      "name": "anshuman parida",
       "phone": "+917077549629",
-      "email": "rahul.kumar@example.com",
-      "address": "Bapuji Nagar, Bhubaneswar",
-      "notes": "Frequent electronics purchaser; prefers 4 installment UPI splits.",
-      "createdAt": "2026-09-24T05:41:32.994Z",
-      "updatedAt": "2026-09-24T07:49:14.722Z",
+      "createdAt": "2026-09-28T05:06:44.885Z",
+      "updatedAt": "2026-09-28T05:06:45.180Z",
       "userId": "usr_1790499247832_szwkj"
     }
   },
@@ -132,81 +144,6 @@
       ],
       "createdAt": "2026-09-24T07:03:41.660Z",
       "updatedAt": "2026-09-24T07:48:18.549Z",
-      "userId": "usr_1790499247832_szwkj"
-    },
-    "PAY-DEMO-2026-001": {
-      "id": "PAY-DEMO-2026-001",
-      "customerId": "cust-demo-rahul",
-      "customerName": "Rahul Kumar",
-      "customerPhone": "+91 98765 43210",
-      "upiId": "demo@upi",
-      "payeeName": "Sharma Electronics & Services",
-      "totalAmountPaise": 1000000,
-      "invoiceId": "INV-2026-089",
-      "notes": "Agreed on 4 bi-weekly UPI payments for electronics purchase.",
-      "splitMethod": "EQUAL",
-      "status": "COMPLETED",
-      "installments": [
-        {
-          "id": "PAY-DEMO-2026-001-INS-1",
-          "sessionId": "PAY-DEMO-2026-001",
-          "sequence": 1,
-          "amountPaise": 250000,
-          "paymentUri": "upi://pay?pa=demo%40upi&pn=Sharma%20Electronics%20%26%20Services&am=2500.00&cu=INR&tn=Demo%20Installment%201%20of%204&tr=PAY-DEMO-2026-001-1",
-          "status": "MANUALLY_CONFIRMED",
-          "confirmationMethod": "MANUAL",
-          "createdAt": "2026-09-24T05:41:32.994Z",
-          "updatedAt": "2026-09-24T05:41:32.994Z",
-          "confirmedAt": "2026-09-24T05:41:32.994Z",
-          "dueDate": "2026-09-10T07:41:32.994Z",
-          "note": "First installment verified via merchant banking app"
-        },
-        {
-          "id": "PAY-DEMO-2026-001-INS-2",
-          "sessionId": "PAY-DEMO-2026-001",
-          "sequence": 2,
-          "amountPaise": 250000,
-          "paymentUri": "upi://pay?pa=demo%40upi&pn=Sharma%20Electronics%20%26%20Services&am=2500.00&cu=INR&tn=Demo%20Installment%202%20of%204&tr=PAY-DEMO-2026-001-2",
-          "status": "MANUALLY_CONFIRMED",
-          "confirmationMethod": "MANUAL",
-          "createdAt": "2026-09-24T05:41:32.994Z",
-          "updatedAt": "2026-09-24T06:41:32.994Z",
-          "confirmedAt": "2026-09-24T06:41:32.994Z",
-          "dueDate": "2026-09-17T07:41:32.994Z",
-          "note": "Second installment confirmed after UPI credit alert"
-        },
-        {
-          "id": "PAY-DEMO-2026-001-INS-3",
-          "sessionId": "PAY-DEMO-2026-001",
-          "sequence": 3,
-          "amountPaise": 250000,
-          "paymentUri": "upi://pay?pa=demo%40upi&pn=Sharma%20Electronics%20%26%20Services&am=2500.00&cu=INR&tn=Demo%20Installment%203%20of%204&tr=PAY-DEMO-2026-001-3",
-          "status": "MANUALLY_CONFIRMED",
-          "confirmationMethod": "MANUAL",
-          "createdAt": "2026-09-24T05:41:32.994Z",
-          "updatedAt": "2026-09-24T07:46:34.910Z",
-          "dueDate": "2026-09-22T07:41:32.994Z",
-          "note": "Awaiting customer scan and bank credit verification",
-          "confirmedAt": "2026-09-24T07:46:34.910Z"
-        },
-        {
-          "id": "PAY-DEMO-2026-001-INS-4",
-          "sessionId": "PAY-DEMO-2026-001",
-          "sequence": 4,
-          "amountPaise": 250000,
-          "paymentUri": "upi://pay?pa=demo%40upi&pn=Sharma%20Electronics%20%26%20Services&am=2500.00&cu=INR&tn=Demo%20Installment%204%20of%204&tr=PAY-DEMO-2026-001-4",
-          "status": "MANUALLY_CONFIRMED",
-          "confirmationMethod": "MANUAL",
-          "createdAt": "2026-09-24T05:41:32.994Z",
-          "updatedAt": "2026-09-24T07:46:29.550Z",
-          "dueDate": "2026-10-01T07:41:32.994Z",
-          "confirmedAt": "2026-09-24T07:46:29.550Z"
-        }
-      ],
-      "dueDate": "2026-10-01T07:41:32.994Z",
-      "isDemo": true,
-      "createdAt": "2026-09-24T05:41:32.994Z",
-      "updatedAt": "2026-09-24T07:46:34.910Z",
       "userId": "usr_1790499247832_szwkj"
     },
     "PAY-20260924-003": {
@@ -275,82 +212,13 @@
       "updatedAt": "2026-09-24T07:44:44.274Z",
       "userId": "usr_1790499247832_szwkj"
     },
-    "PAY-20260924-004": {
-      "id": "PAY-20260924-004",
-      "customerId": "cust-demo-rahul",
-      "customerName": "Rahul Kumar",
-      "customerPhone": "+91 98765 43210",
-      "upiId": "anshumanparida913@upi",
-      "payeeName": "Anshuman Parida",
-      "totalAmountPaise": 1000000,
-      "splitMethod": "EQUAL",
-      "status": "COMPLETED",
-      "installments": [
-        {
-          "id": "PAY-20260924-004-INS-1",
-          "sessionId": "PAY-20260924-004",
-          "sequence": 1,
-          "amountPaise": 250000,
-          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%201%20of%204%20(PAY-20260924-004)&tr=PAY-20260924-004-INS-1",
-          "status": "MANUALLY_CONFIRMED",
-          "confirmationMethod": "MANUAL",
-          "createdAt": "2026-09-24T07:45:38.666Z",
-          "updatedAt": "2026-09-24T07:45:46.032Z",
-          "dueDate": "2026-09-24T07:45:38.666Z",
-          "confirmedAt": "2026-09-24T07:45:46.032Z"
-        },
-        {
-          "id": "PAY-20260924-004-INS-2",
-          "sessionId": "PAY-20260924-004",
-          "sequence": 2,
-          "amountPaise": 250000,
-          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%202%20of%204%20(PAY-20260924-004)&tr=PAY-20260924-004-INS-2",
-          "status": "MANUALLY_CONFIRMED",
-          "confirmationMethod": "MANUAL",
-          "createdAt": "2026-09-24T07:45:38.666Z",
-          "updatedAt": "2026-09-24T07:45:56.819Z",
-          "dueDate": "2026-10-01T07:45:38.666Z",
-          "confirmedAt": "2026-09-24T07:45:56.819Z"
-        },
-        {
-          "id": "PAY-20260924-004-INS-3",
-          "sessionId": "PAY-20260924-004",
-          "sequence": 3,
-          "amountPaise": 250000,
-          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%203%20of%204%20(PAY-20260924-004)&tr=PAY-20260924-004-INS-3",
-          "status": "MANUALLY_CONFIRMED",
-          "confirmationMethod": "MANUAL",
-          "createdAt": "2026-09-24T07:45:38.666Z",
-          "updatedAt": "2026-09-24T07:46:02.509Z",
-          "dueDate": "2026-10-08T07:45:38.666Z",
-          "confirmedAt": "2026-09-24T07:46:02.509Z"
-        },
-        {
-          "id": "PAY-20260924-004-INS-4",
-          "sessionId": "PAY-20260924-004",
-          "sequence": 4,
-          "amountPaise": 250000,
-          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%204%20of%204%20(PAY-20260924-004)&tr=PAY-20260924-004-INS-4",
-          "status": "MANUALLY_CONFIRMED",
-          "confirmationMethod": "MANUAL",
-          "createdAt": "2026-09-24T07:45:38.666Z",
-          "updatedAt": "2026-09-24T07:46:07.440Z",
-          "dueDate": "2026-10-15T07:45:38.666Z",
-          "confirmedAt": "2026-09-24T07:46:07.440Z"
-        }
-      ],
-      "dueDate": "2026-10-15T07:45:38.666Z",
-      "createdAt": "2026-09-24T07:45:38.666Z",
-      "updatedAt": "2026-09-24T07:46:07.440Z",
-      "userId": "usr_1790499247832_szwkj"
-    },
     "PAY-20260927-005": {
       "id": "PAY-20260927-005",
       "upiId": "anshumanparida913@upi",
       "payeeName": "Anshuman Parida",
       "totalAmountPaise": 1000000,
       "splitMethod": "EQUAL",
-      "status": "PARTIALLY_PAID",
+      "status": "COMPLETED",
       "installments": [
         {
           "id": "PAY-20260927-005-INS-1",
@@ -384,11 +252,12 @@
           "sequence": 3,
           "amountPaise": 250000,
           "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%203%20of%204%20(PAY-20260927-005)&tr=PAY-20260927-005-INS-3",
-          "status": "QR_READY",
-          "confirmationMethod": "NONE",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
           "createdAt": "2026-09-27T08:59:30.627Z",
-          "updatedAt": "2026-09-27T08:59:30.627Z",
-          "dueDate": "2026-10-11T08:59:30.627Z"
+          "updatedAt": "2026-09-28T08:41:34.225Z",
+          "dueDate": "2026-10-11T08:59:30.627Z",
+          "confirmedAt": "2026-09-28T08:41:34.225Z"
         },
         {
           "id": "PAY-20260927-005-INS-4",
@@ -396,16 +265,588 @@
           "sequence": 4,
           "amountPaise": 250000,
           "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%204%20of%204%20(PAY-20260927-005)&tr=PAY-20260927-005-INS-4",
-          "status": "QR_READY",
-          "confirmationMethod": "NONE",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
           "createdAt": "2026-09-27T08:59:30.627Z",
-          "updatedAt": "2026-09-27T08:59:30.627Z",
-          "dueDate": "2026-10-18T08:59:30.627Z"
+          "updatedAt": "2026-09-28T08:41:36.992Z",
+          "dueDate": "2026-10-18T08:59:30.627Z",
+          "confirmedAt": "2026-09-28T08:41:36.992Z"
         }
       ],
       "dueDate": "2026-10-18T08:59:30.627Z",
       "createdAt": "2026-09-27T08:59:30.627Z",
-      "updatedAt": "2026-09-27T09:00:44.571Z",
+      "updatedAt": "2026-09-28T08:41:36.992Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "PAY-20260928-001": {
+      "id": "PAY-20260928-001",
+      "upiId": "anshumanparida913@upi",
+      "payeeName": "Anshuman Parida",
+      "totalAmountPaise": 1000000,
+      "category": "Retail",
+      "tags": [
+        "Retail",
+        "Installment"
+      ],
+      "splitMethod": "EQUAL",
+      "status": "COMPLETED",
+      "installments": [
+        {
+          "id": "PAY-20260928-001-INS-1",
+          "sessionId": "PAY-20260928-001",
+          "sequence": 1,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%201%20of%204%20(PAY-20260928-001)&tr=PAY-20260928-001-INS-1",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:01:06.506Z",
+          "updatedAt": "2026-09-27T19:01:11.556Z",
+          "dueDate": "2026-09-27T19:01:06.507Z",
+          "confirmedAt": "2026-09-27T19:01:11.556Z"
+        },
+        {
+          "id": "PAY-20260928-001-INS-2",
+          "sessionId": "PAY-20260928-001",
+          "sequence": 2,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%202%20of%204%20(PAY-20260928-001)&tr=PAY-20260928-001-INS-2",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:01:06.506Z",
+          "updatedAt": "2026-09-27T19:01:16.106Z",
+          "dueDate": "2026-10-04T19:01:06.507Z",
+          "confirmedAt": "2026-09-27T19:01:16.106Z"
+        },
+        {
+          "id": "PAY-20260928-001-INS-3",
+          "sessionId": "PAY-20260928-001",
+          "sequence": 3,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%203%20of%204%20(PAY-20260928-001)&tr=PAY-20260928-001-INS-3",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:01:06.506Z",
+          "updatedAt": "2026-09-27T19:01:20.273Z",
+          "dueDate": "2026-10-11T19:01:06.507Z",
+          "confirmedAt": "2026-09-27T19:01:20.273Z"
+        },
+        {
+          "id": "PAY-20260928-001-INS-4",
+          "sessionId": "PAY-20260928-001",
+          "sequence": 4,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%204%20of%204%20(PAY-20260928-001)&tr=PAY-20260928-001-INS-4",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:01:06.506Z",
+          "updatedAt": "2026-09-27T19:01:23.023Z",
+          "dueDate": "2026-10-18T19:01:06.507Z",
+          "confirmedAt": "2026-09-27T19:01:23.023Z"
+        }
+      ],
+      "dueDate": "2026-10-18T19:01:06.507Z",
+      "createdAt": "2026-09-27T19:01:06.506Z",
+      "updatedAt": "2026-09-27T19:01:23.023Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "PAY-20260928-002": {
+      "id": "PAY-20260928-002",
+      "upiId": "anshumanparida913@upi",
+      "payeeName": "Anshuman Parida",
+      "totalAmountPaise": 1000000,
+      "category": "Retail",
+      "tags": [
+        "Retail",
+        "Installment"
+      ],
+      "splitMethod": "EQUAL",
+      "status": "COMPLETED",
+      "installments": [
+        {
+          "id": "PAY-20260928-002-INS-1",
+          "sessionId": "PAY-20260928-002",
+          "sequence": 1,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%201%20of%204%20(PAY-20260928-002)&tr=PAY-20260928-002-INS-1",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:04:11.724Z",
+          "updatedAt": "2026-09-27T19:10:11.179Z",
+          "dueDate": "2026-09-27T19:04:11.724Z",
+          "confirmedAt": "2026-09-27T19:10:11.179Z"
+        },
+        {
+          "id": "PAY-20260928-002-INS-2",
+          "sessionId": "PAY-20260928-002",
+          "sequence": 2,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%202%20of%204%20(PAY-20260928-002)&tr=PAY-20260928-002-INS-2",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:04:11.724Z",
+          "updatedAt": "2026-09-27T19:10:14.546Z",
+          "dueDate": "2026-10-04T19:04:11.724Z",
+          "confirmedAt": "2026-09-27T19:10:14.546Z"
+        },
+        {
+          "id": "PAY-20260928-002-INS-3",
+          "sessionId": "PAY-20260928-002",
+          "sequence": 3,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%203%20of%204%20(PAY-20260928-002)&tr=PAY-20260928-002-INS-3",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:04:11.724Z",
+          "updatedAt": "2026-09-27T19:10:17.313Z",
+          "dueDate": "2026-10-11T19:04:11.724Z",
+          "confirmedAt": "2026-09-27T19:10:17.313Z"
+        },
+        {
+          "id": "PAY-20260928-002-INS-4",
+          "sessionId": "PAY-20260928-002",
+          "sequence": 4,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%204%20of%204%20(PAY-20260928-002)&tr=PAY-20260928-002-INS-4",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:04:11.724Z",
+          "updatedAt": "2026-09-27T19:10:20.963Z",
+          "dueDate": "2026-10-18T19:04:11.724Z",
+          "confirmedAt": "2026-09-27T19:10:20.963Z"
+        }
+      ],
+      "dueDate": "2026-10-18T19:04:11.724Z",
+      "createdAt": "2026-09-27T19:04:11.724Z",
+      "updatedAt": "2026-09-27T19:10:20.963Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "PAY-20260928-003": {
+      "id": "PAY-20260928-003",
+      "upiId": "anshumanparida913@upi",
+      "payeeName": "Anshuman Parida",
+      "totalAmountPaise": 1000000,
+      "category": "Retail",
+      "tags": [
+        "Retail",
+        "Installment"
+      ],
+      "splitMethod": "EQUAL",
+      "status": "COMPLETED",
+      "installments": [
+        {
+          "id": "PAY-20260928-003-INS-1",
+          "sessionId": "PAY-20260928-003",
+          "sequence": 1,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%201%20of%204%20(PAY-20260928-003)&tr=PAY-20260928-003-INS-1",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:07:51.028Z",
+          "updatedAt": "2026-09-27T19:11:18.397Z",
+          "dueDate": "2026-09-27T19:07:51.028Z",
+          "confirmedAt": "2026-09-27T19:11:18.397Z"
+        },
+        {
+          "id": "PAY-20260928-003-INS-2",
+          "sessionId": "PAY-20260928-003",
+          "sequence": 2,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%202%20of%204%20(PAY-20260928-003)&tr=PAY-20260928-003-INS-2",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:07:51.028Z",
+          "updatedAt": "2026-09-27T19:11:21.147Z",
+          "dueDate": "2026-10-04T19:07:51.028Z",
+          "confirmedAt": "2026-09-27T19:11:21.147Z"
+        },
+        {
+          "id": "PAY-20260928-003-INS-3",
+          "sessionId": "PAY-20260928-003",
+          "sequence": 3,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%203%20of%204%20(PAY-20260928-003)&tr=PAY-20260928-003-INS-3",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:07:51.028Z",
+          "updatedAt": "2026-09-27T19:11:24.080Z",
+          "dueDate": "2026-10-11T19:07:51.028Z",
+          "confirmedAt": "2026-09-27T19:11:24.080Z"
+        },
+        {
+          "id": "PAY-20260928-003-INS-4",
+          "sessionId": "PAY-20260928-003",
+          "sequence": 4,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%204%20of%204%20(PAY-20260928-003)&tr=PAY-20260928-003-INS-4",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:07:51.028Z",
+          "updatedAt": "2026-09-27T19:11:26.630Z",
+          "dueDate": "2026-10-18T19:07:51.028Z",
+          "confirmedAt": "2026-09-27T19:11:26.630Z"
+        }
+      ],
+      "dueDate": "2026-10-18T19:07:51.028Z",
+      "createdAt": "2026-09-27T19:07:51.028Z",
+      "updatedAt": "2026-09-27T19:11:26.630Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "PAY-20260928-005": {
+      "id": "PAY-20260928-005",
+      "upiId": "anshumanparida913@upi",
+      "payeeName": "Anshuman Parida",
+      "totalAmountPaise": 1000000,
+      "category": "Retail",
+      "tags": [
+        "Retail",
+        "Installment"
+      ],
+      "splitMethod": "EQUAL",
+      "status": "COMPLETED",
+      "installments": [
+        {
+          "id": "PAY-20260928-005-INS-1",
+          "sessionId": "PAY-20260928-005",
+          "sequence": 1,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%201%20of%204%20(PAY-20260928-005)&tr=PAY-20260928-005-INS-1",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:21:32.014Z",
+          "updatedAt": "2026-09-27T19:21:38.261Z",
+          "dueDate": "2026-09-27T19:21:32.014Z",
+          "confirmedAt": "2026-09-27T19:21:38.261Z"
+        },
+        {
+          "id": "PAY-20260928-005-INS-2",
+          "sessionId": "PAY-20260928-005",
+          "sequence": 2,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%202%20of%204%20(PAY-20260928-005)&tr=PAY-20260928-005-INS-2",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:21:32.014Z",
+          "updatedAt": "2026-09-27T19:21:41.327Z",
+          "dueDate": "2026-10-04T19:21:32.014Z",
+          "confirmedAt": "2026-09-27T19:21:41.327Z"
+        },
+        {
+          "id": "PAY-20260928-005-INS-3",
+          "sessionId": "PAY-20260928-005",
+          "sequence": 3,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%203%20of%204%20(PAY-20260928-005)&tr=PAY-20260928-005-INS-3",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:21:32.014Z",
+          "updatedAt": "2026-09-27T19:21:44.027Z",
+          "dueDate": "2026-10-11T19:21:32.014Z",
+          "confirmedAt": "2026-09-27T19:21:44.027Z"
+        },
+        {
+          "id": "PAY-20260928-005-INS-4",
+          "sessionId": "PAY-20260928-005",
+          "sequence": 4,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%204%20of%204%20(PAY-20260928-005)&tr=PAY-20260928-005-INS-4",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T19:21:32.014Z",
+          "updatedAt": "2026-09-27T19:21:46.344Z",
+          "dueDate": "2026-10-18T19:21:32.014Z",
+          "confirmedAt": "2026-09-27T19:21:46.344Z"
+        }
+      ],
+      "dueDate": "2026-10-18T19:21:32.014Z",
+      "createdAt": "2026-09-27T19:21:32.014Z",
+      "updatedAt": "2026-09-27T19:21:46.344Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "PAY-20260928-006": {
+      "id": "PAY-20260928-006",
+      "upiId": "anshumanparida913@upi",
+      "payeeName": "Anshuman Parida",
+      "totalAmountPaise": 1000000,
+      "category": "Retail",
+      "tags": [
+        "Retail",
+        "Installment"
+      ],
+      "splitMethod": "EQUAL",
+      "status": "COMPLETED",
+      "installments": [
+        {
+          "id": "PAY-20260928-006-INS-1",
+          "sessionId": "PAY-20260928-006",
+          "sequence": 1,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%201%20of%204%20(PAY-20260928-006)&tr=PAY-20260928-006-INS-1",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T20:30:14.615Z",
+          "updatedAt": "2026-09-27T20:30:20.532Z",
+          "dueDate": "2026-09-27T20:30:14.615Z",
+          "confirmedAt": "2026-09-27T20:30:20.532Z"
+        },
+        {
+          "id": "PAY-20260928-006-INS-2",
+          "sessionId": "PAY-20260928-006",
+          "sequence": 2,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%202%20of%204%20(PAY-20260928-006)&tr=PAY-20260928-006-INS-2",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T20:30:14.615Z",
+          "updatedAt": "2026-09-27T20:30:24.848Z",
+          "dueDate": "2026-10-04T20:30:14.615Z",
+          "confirmedAt": "2026-09-27T20:30:24.848Z"
+        },
+        {
+          "id": "PAY-20260928-006-INS-3",
+          "sessionId": "PAY-20260928-006",
+          "sequence": 3,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%203%20of%204%20(PAY-20260928-006)&tr=PAY-20260928-006-INS-3",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T20:30:14.615Z",
+          "updatedAt": "2026-09-27T20:30:27.565Z",
+          "dueDate": "2026-10-11T20:30:14.615Z",
+          "confirmedAt": "2026-09-27T20:30:27.565Z"
+        },
+        {
+          "id": "PAY-20260928-006-INS-4",
+          "sessionId": "PAY-20260928-006",
+          "sequence": 4,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%204%20of%204%20(PAY-20260928-006)&tr=PAY-20260928-006-INS-4",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T20:30:14.615Z",
+          "updatedAt": "2026-09-27T20:30:30.181Z",
+          "dueDate": "2026-10-18T20:30:14.615Z",
+          "confirmedAt": "2026-09-27T20:30:30.181Z"
+        }
+      ],
+      "dueDate": "2026-10-18T20:30:14.615Z",
+      "createdAt": "2026-09-27T20:30:14.615Z",
+      "updatedAt": "2026-09-27T20:30:30.181Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "PAY-20260928-007": {
+      "id": "PAY-20260928-007",
+      "upiId": "anshumanparida913@upi",
+      "payeeName": "Anshuman Parida",
+      "totalAmountPaise": 1000000,
+      "category": "Retail",
+      "tags": [
+        "Retail",
+        "Installment"
+      ],
+      "splitMethod": "EQUAL",
+      "status": "COMPLETED",
+      "installments": [
+        {
+          "id": "PAY-20260928-007-INS-1",
+          "sessionId": "PAY-20260928-007",
+          "sequence": 1,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%201%20of%204%20(PAY-20260928-007)&tr=PAY-20260928-007-INS-1",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T20:30:39.399Z",
+          "updatedAt": "2026-09-27T20:30:43.999Z",
+          "dueDate": "2026-09-27T20:30:39.399Z",
+          "confirmedAt": "2026-09-27T20:30:43.999Z"
+        },
+        {
+          "id": "PAY-20260928-007-INS-2",
+          "sessionId": "PAY-20260928-007",
+          "sequence": 2,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%202%20of%204%20(PAY-20260928-007)&tr=PAY-20260928-007-INS-2",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T20:30:39.399Z",
+          "updatedAt": "2026-09-27T20:30:47.049Z",
+          "dueDate": "2026-10-04T20:30:39.399Z",
+          "confirmedAt": "2026-09-27T20:30:47.049Z"
+        },
+        {
+          "id": "PAY-20260928-007-INS-3",
+          "sessionId": "PAY-20260928-007",
+          "sequence": 3,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%203%20of%204%20(PAY-20260928-007)&tr=PAY-20260928-007-INS-3",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T20:30:39.399Z",
+          "updatedAt": "2026-09-27T20:30:49.749Z",
+          "dueDate": "2026-10-11T20:30:39.399Z",
+          "confirmedAt": "2026-09-27T20:30:49.749Z"
+        },
+        {
+          "id": "PAY-20260928-007-INS-4",
+          "sessionId": "PAY-20260928-007",
+          "sequence": 4,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%204%20of%204%20(PAY-20260928-007)&tr=PAY-20260928-007-INS-4",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T20:30:39.399Z",
+          "updatedAt": "2026-09-27T20:30:52.232Z",
+          "dueDate": "2026-10-18T20:30:39.399Z",
+          "confirmedAt": "2026-09-27T20:30:52.232Z"
+        }
+      ],
+      "dueDate": "2026-10-18T20:30:39.399Z",
+      "createdAt": "2026-09-27T20:30:39.399Z",
+      "updatedAt": "2026-09-27T20:30:52.232Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "PAY-20260928-008": {
+      "id": "PAY-20260928-008",
+      "upiId": "anshumanparida913@upi",
+      "payeeName": "Anshuman Parida",
+      "totalAmountPaise": 1000000,
+      "category": "Retail",
+      "tags": [
+        "Retail",
+        "Installment"
+      ],
+      "splitMethod": "EQUAL",
+      "status": "COMPLETED",
+      "installments": [
+        {
+          "id": "PAY-20260928-008-INS-1",
+          "sessionId": "PAY-20260928-008",
+          "sequence": 1,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%201%20of%204%20(PAY-20260928-008)&tr=PAY-20260928-008-INS-1",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T20:31:33.067Z",
+          "updatedAt": "2026-09-27T20:31:37.632Z",
+          "dueDate": "2026-09-27T20:31:33.067Z",
+          "confirmedAt": "2026-09-27T20:31:37.632Z"
+        },
+        {
+          "id": "PAY-20260928-008-INS-2",
+          "sessionId": "PAY-20260928-008",
+          "sequence": 2,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%202%20of%204%20(PAY-20260928-008)&tr=PAY-20260928-008-INS-2",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T20:31:33.067Z",
+          "updatedAt": "2026-09-27T20:31:40.432Z",
+          "dueDate": "2026-10-04T20:31:33.067Z",
+          "confirmedAt": "2026-09-27T20:31:40.432Z"
+        },
+        {
+          "id": "PAY-20260928-008-INS-3",
+          "sessionId": "PAY-20260928-008",
+          "sequence": 3,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%203%20of%204%20(PAY-20260928-008)&tr=PAY-20260928-008-INS-3",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T20:31:33.067Z",
+          "updatedAt": "2026-09-27T20:31:43.549Z",
+          "dueDate": "2026-10-11T20:31:33.067Z",
+          "confirmedAt": "2026-09-27T20:31:43.549Z"
+        },
+        {
+          "id": "PAY-20260928-008-INS-4",
+          "sessionId": "PAY-20260928-008",
+          "sequence": 4,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=anshumanparida913%40upi&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%204%20of%204%20(PAY-20260928-008)&tr=PAY-20260928-008-INS-4",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-27T20:31:33.067Z",
+          "updatedAt": "2026-09-27T20:31:46.449Z",
+          "dueDate": "2026-10-18T20:31:33.067Z",
+          "confirmedAt": "2026-09-27T20:31:46.449Z"
+        }
+      ],
+      "dueDate": "2026-10-18T20:31:33.067Z",
+      "createdAt": "2026-09-27T20:31:33.067Z",
+      "updatedAt": "2026-09-27T20:31:46.449Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "PAY-20260928-009": {
+      "id": "PAY-20260928-009",
+      "customerId": "cust_1790572004885_jmxx",
+      "customerName": "anshuman parida",
+      "customerPhone": "+917077549629",
+      "upiId": "dudan06@ybl",
+      "payeeName": "Anshuman Parida",
+      "totalAmountPaise": 1000000,
+      "category": "Retail",
+      "tags": [
+        "Retail",
+        "Installment"
+      ],
+      "splitMethod": "EQUAL",
+      "status": "COMPLETED",
+      "installments": [
+        {
+          "id": "PAY-20260928-009-INS-1",
+          "sessionId": "PAY-20260928-009",
+          "sequence": 1,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=dudan06%40ybl&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%201%20of%204%20(PAY-20260928-009)&tr=PAY-20260928-009-INS-1",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-28T05:06:44.885Z",
+          "updatedAt": "2026-09-28T05:06:54.102Z",
+          "dueDate": "2026-09-28T05:06:44.885Z",
+          "confirmedAt": "2026-09-28T05:06:54.102Z"
+        },
+        {
+          "id": "PAY-20260928-009-INS-2",
+          "sessionId": "PAY-20260928-009",
+          "sequence": 2,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=dudan06%40ybl&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%202%20of%204%20(PAY-20260928-009)&tr=PAY-20260928-009-INS-2",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-28T05:06:44.885Z",
+          "updatedAt": "2026-09-28T05:06:57.835Z",
+          "dueDate": "2026-10-05T05:06:44.885Z",
+          "confirmedAt": "2026-09-28T05:06:57.835Z"
+        },
+        {
+          "id": "PAY-20260928-009-INS-3",
+          "sessionId": "PAY-20260928-009",
+          "sequence": 3,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=dudan06%40ybl&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%203%20of%204%20(PAY-20260928-009)&tr=PAY-20260928-009-INS-3",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-28T05:06:44.885Z",
+          "updatedAt": "2026-09-28T05:07:00.884Z",
+          "dueDate": "2026-10-12T05:06:44.885Z",
+          "confirmedAt": "2026-09-28T05:07:00.884Z"
+        },
+        {
+          "id": "PAY-20260928-009-INS-4",
+          "sessionId": "PAY-20260928-009",
+          "sequence": 4,
+          "amountPaise": 250000,
+          "paymentUri": "upi://pay?pa=dudan06%40ybl&pn=Anshuman%20Parida&am=2500.00&cu=INR&tn=Installment%204%20of%204%20(PAY-20260928-009)&tr=PAY-20260928-009-INS-4",
+          "status": "MANUALLY_CONFIRMED",
+          "confirmationMethod": "MANUAL",
+          "createdAt": "2026-09-28T05:06:44.885Z",
+          "updatedAt": "2026-09-28T05:07:05.101Z",
+          "dueDate": "2026-10-19T05:06:44.885Z",
+          "confirmedAt": "2026-09-28T05:07:05.101Z"
+        }
+      ],
+      "dueDate": "2026-10-19T05:06:44.885Z",
+      "createdAt": "2026-09-28T05:06:44.885Z",
+      "updatedAt": "2026-09-28T05:07:05.101Z",
       "userId": "usr_1790499247832_szwkj"
     }
   },
@@ -738,8 +1179,702 @@
       "id": "AUD-1790499644571-2o6o",
       "timestamp": "2026-09-27T09:00:44.571Z",
       "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790572025102-uh5v": {
+      "sessionId": "PAY-20260928-009",
+      "previousState": "PARTIALLY_PAID",
+      "newState": "COMPLETED",
+      "note": "Session overall status automatically updated to COMPLETED",
+      "id": "AUD-1790572025102-uh5v",
+      "timestamp": "2026-09-28T05:07:05.102Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790572025101-hggq": {
+      "sessionId": "PAY-20260928-009",
+      "installmentId": "PAY-20260928-009-INS-4",
+      "installmentSequence": 4,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790572025101-hggq",
+      "timestamp": "2026-09-28T05:07:05.101Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790572020885-jrbu": {
+      "sessionId": "PAY-20260928-009",
+      "installmentId": "PAY-20260928-009-INS-3",
+      "installmentSequence": 3,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790572020885-jrbu",
+      "timestamp": "2026-09-28T05:07:00.885Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790572017835-geot": {
+      "sessionId": "PAY-20260928-009",
+      "installmentId": "PAY-20260928-009-INS-2",
+      "installmentSequence": 2,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790572017835-geot",
+      "timestamp": "2026-09-28T05:06:57.835Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790572014102-1z9s": {
+      "sessionId": "PAY-20260928-009",
+      "previousState": "ACTIVE",
+      "newState": "PARTIALLY_PAID",
+      "note": "Session overall status automatically updated to PARTIALLY_PAID",
+      "id": "AUD-1790572014102-1z9s",
+      "timestamp": "2026-09-28T05:06:54.102Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790572014102-fz9c": {
+      "sessionId": "PAY-20260928-009",
+      "installmentId": "PAY-20260928-009-INS-1",
+      "installmentSequence": 1,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790572014102-fz9c",
+      "timestamp": "2026-09-28T05:06:54.102Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790572005180-9mmh": {
+      "sessionId": "PAY-20260928-009",
+      "newState": "DRAFT",
+      "note": "Session created with 4 installments (EQUAL)",
+      "id": "AUD-1790572005180-9mmh",
+      "timestamp": "2026-09-28T05:06:45.180Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790535666734-0stn": {
+      "sessionId": "PAY-20260928-001",
+      "newState": "DRAFT",
+      "note": "Session created with 4 installments (EQUAL)",
+      "id": "AUD-1790535666734-0stn",
+      "timestamp": "2026-09-27T19:01:06.734Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790535671556-xenz": {
+      "sessionId": "PAY-20260928-001",
+      "previousState": "ACTIVE",
+      "newState": "PARTIALLY_PAID",
+      "note": "Session overall status automatically updated to PARTIALLY_PAID",
+      "id": "AUD-1790535671556-xenz",
+      "timestamp": "2026-09-27T19:01:11.556Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790535671556-sgqo": {
+      "sessionId": "PAY-20260928-001",
+      "installmentId": "PAY-20260928-001-INS-1",
+      "installmentSequence": 1,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790535671556-sgqo",
+      "timestamp": "2026-09-27T19:01:11.556Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790535676106-n0rh": {
+      "sessionId": "PAY-20260928-001",
+      "installmentId": "PAY-20260928-001-INS-2",
+      "installmentSequence": 2,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790535676106-n0rh",
+      "timestamp": "2026-09-27T19:01:16.106Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790535680273-mezb": {
+      "sessionId": "PAY-20260928-001",
+      "installmentId": "PAY-20260928-001-INS-3",
+      "installmentSequence": 3,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790535680273-mezb",
+      "timestamp": "2026-09-27T19:01:20.273Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790535683023-p3bh": {
+      "sessionId": "PAY-20260928-001",
+      "previousState": "PARTIALLY_PAID",
+      "newState": "COMPLETED",
+      "note": "Session overall status automatically updated to COMPLETED",
+      "id": "AUD-1790535683023-p3bh",
+      "timestamp": "2026-09-27T19:01:23.023Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790535683023-aob2": {
+      "sessionId": "PAY-20260928-001",
+      "installmentId": "PAY-20260928-001-INS-4",
+      "installmentSequence": 4,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790535683023-aob2",
+      "timestamp": "2026-09-27T19:01:23.023Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790535851859-qou9": {
+      "sessionId": "PAY-20260928-002",
+      "newState": "DRAFT",
+      "note": "Session created with 4 installments (EQUAL)",
+      "id": "AUD-1790535851859-qou9",
+      "timestamp": "2026-09-27T19:04:11.860Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536071238-s0uj": {
+      "sessionId": "PAY-20260928-003",
+      "newState": "DRAFT",
+      "note": "Session created with 4 installments (EQUAL)",
+      "id": "AUD-1790536071238-s0uj",
+      "timestamp": "2026-09-27T19:07:51.238Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536211180-g9w5": {
+      "sessionId": "PAY-20260928-002",
+      "previousState": "ACTIVE",
+      "newState": "PARTIALLY_PAID",
+      "note": "Session overall status automatically updated to PARTIALLY_PAID",
+      "id": "AUD-1790536211180-g9w5",
+      "timestamp": "2026-09-27T19:10:11.180Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536211179-ktra": {
+      "sessionId": "PAY-20260928-002",
+      "installmentId": "PAY-20260928-002-INS-1",
+      "installmentSequence": 1,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536211179-ktra",
+      "timestamp": "2026-09-27T19:10:11.179Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536214546-oa0g": {
+      "sessionId": "PAY-20260928-002",
+      "installmentId": "PAY-20260928-002-INS-2",
+      "installmentSequence": 2,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536214546-oa0g",
+      "timestamp": "2026-09-27T19:10:14.546Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536217313-uv0t": {
+      "sessionId": "PAY-20260928-002",
+      "installmentId": "PAY-20260928-002-INS-3",
+      "installmentSequence": 3,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536217313-uv0t",
+      "timestamp": "2026-09-27T19:10:17.313Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536220963-cpxl": {
+      "sessionId": "PAY-20260928-002",
+      "previousState": "PARTIALLY_PAID",
+      "newState": "COMPLETED",
+      "note": "Session overall status automatically updated to COMPLETED",
+      "id": "AUD-1790536220963-cpxl",
+      "timestamp": "2026-09-27T19:10:20.963Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536220963-9umy": {
+      "sessionId": "PAY-20260928-002",
+      "installmentId": "PAY-20260928-002-INS-4",
+      "installmentSequence": 4,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536220963-9umy",
+      "timestamp": "2026-09-27T19:10:20.963Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536256097-zp86": {
+      "sessionId": "PAY-DEMO-2026-001",
+      "newState": "DRAFT",
+      "note": "Demo session initialized with 4 installments",
+      "id": "AUD-1790536256097-zp86",
+      "timestamp": "2026-09-27T19:10:56.097Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536278397-glqg": {
+      "sessionId": "PAY-20260928-003",
+      "previousState": "ACTIVE",
+      "newState": "PARTIALLY_PAID",
+      "note": "Session overall status automatically updated to PARTIALLY_PAID",
+      "id": "AUD-1790536278397-glqg",
+      "timestamp": "2026-09-27T19:11:18.397Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536278397-wcl6": {
+      "sessionId": "PAY-20260928-003",
+      "installmentId": "PAY-20260928-003-INS-1",
+      "installmentSequence": 1,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536278397-wcl6",
+      "timestamp": "2026-09-27T19:11:18.397Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536281147-pz9i": {
+      "sessionId": "PAY-20260928-003",
+      "installmentId": "PAY-20260928-003-INS-2",
+      "installmentSequence": 2,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536281147-pz9i",
+      "timestamp": "2026-09-27T19:11:21.147Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536284080-c9lg": {
+      "sessionId": "PAY-20260928-003",
+      "installmentId": "PAY-20260928-003-INS-3",
+      "installmentSequence": 3,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536284080-c9lg",
+      "timestamp": "2026-09-27T19:11:24.080Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536286630-eo14": {
+      "sessionId": "PAY-20260928-003",
+      "previousState": "PARTIALLY_PAID",
+      "newState": "COMPLETED",
+      "note": "Session overall status automatically updated to COMPLETED",
+      "id": "AUD-1790536286630-eo14",
+      "timestamp": "2026-09-27T19:11:26.630Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536286630-j77q": {
+      "sessionId": "PAY-20260928-003",
+      "installmentId": "PAY-20260928-003-INS-4",
+      "installmentSequence": 4,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536286630-j77q",
+      "timestamp": "2026-09-27T19:11:26.630Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536300280-y2yn": {
+      "sessionId": "PAY-DEMO-2026-001",
+      "installmentId": "PAY-DEMO-2026-001-INS-3",
+      "installmentSequence": 3,
+      "previousState": "PENDING",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from PENDING to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536300280-y2yn",
+      "timestamp": "2026-09-27T19:11:40.280Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536302897-ba17": {
+      "sessionId": "PAY-DEMO-2026-001",
+      "previousState": "PARTIALLY_PAID",
+      "newState": "COMPLETED",
+      "note": "Session overall status automatically updated to COMPLETED",
+      "id": "AUD-1790536302897-ba17",
+      "timestamp": "2026-09-27T19:11:42.897Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536302897-3r48": {
+      "sessionId": "PAY-DEMO-2026-001",
+      "installmentId": "PAY-DEMO-2026-001-INS-4",
+      "installmentSequence": 4,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536302897-3r48",
+      "timestamp": "2026-09-27T19:11:42.897Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536906344-46ix": {
+      "sessionId": "PAY-20260928-005",
+      "previousState": "PARTIALLY_PAID",
+      "newState": "COMPLETED",
+      "note": "Session overall status automatically updated to COMPLETED",
+      "id": "AUD-1790536906344-46ix",
+      "timestamp": "2026-09-27T19:21:46.344Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536906344-gbit": {
+      "sessionId": "PAY-20260928-005",
+      "installmentId": "PAY-20260928-005-INS-4",
+      "installmentSequence": 4,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536906344-gbit",
+      "timestamp": "2026-09-27T19:21:46.344Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536904027-xtoj": {
+      "sessionId": "PAY-20260928-005",
+      "installmentId": "PAY-20260928-005-INS-3",
+      "installmentSequence": 3,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536904027-xtoj",
+      "timestamp": "2026-09-27T19:21:44.027Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536901327-vz6n": {
+      "sessionId": "PAY-20260928-005",
+      "installmentId": "PAY-20260928-005-INS-2",
+      "installmentSequence": 2,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536901327-vz6n",
+      "timestamp": "2026-09-27T19:21:41.327Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536898261-jqft": {
+      "sessionId": "PAY-20260928-005",
+      "previousState": "ACTIVE",
+      "newState": "PARTIALLY_PAID",
+      "note": "Session overall status automatically updated to PARTIALLY_PAID",
+      "id": "AUD-1790536898261-jqft",
+      "timestamp": "2026-09-27T19:21:38.261Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536898261-x4qu": {
+      "sessionId": "PAY-20260928-005",
+      "installmentId": "PAY-20260928-005-INS-1",
+      "installmentSequence": 1,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790536898261-x4qu",
+      "timestamp": "2026-09-27T19:21:38.261Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790536892332-ghbm": {
+      "sessionId": "PAY-20260928-005",
+      "newState": "DRAFT",
+      "note": "Session created with 4 installments (EQUAL)",
+      "id": "AUD-1790536892332-ghbm",
+      "timestamp": "2026-09-27T19:21:32.332Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541016477-6seg": {
+      "sessionId": "PAY-20260928-006",
+      "newState": "DRAFT",
+      "note": "Session created with 4 installments (EQUAL)",
+      "id": "AUD-1790541016477-6seg",
+      "timestamp": "2026-09-27T20:30:16.478Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541020532-r7hf": {
+      "sessionId": "PAY-20260928-006",
+      "previousState": "ACTIVE",
+      "newState": "PARTIALLY_PAID",
+      "note": "Session overall status automatically updated to PARTIALLY_PAID",
+      "id": "AUD-1790541020532-r7hf",
+      "timestamp": "2026-09-27T20:30:20.532Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541020532-li4v": {
+      "sessionId": "PAY-20260928-006",
+      "installmentId": "PAY-20260928-006-INS-1",
+      "installmentSequence": 1,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790541020532-li4v",
+      "timestamp": "2026-09-27T20:30:20.532Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541024848-7vly": {
+      "sessionId": "PAY-20260928-006",
+      "installmentId": "PAY-20260928-006-INS-2",
+      "installmentSequence": 2,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790541024848-7vly",
+      "timestamp": "2026-09-27T20:30:24.848Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541027565-qeq6": {
+      "sessionId": "PAY-20260928-006",
+      "installmentId": "PAY-20260928-006-INS-3",
+      "installmentSequence": 3,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790541027565-qeq6",
+      "timestamp": "2026-09-27T20:30:27.565Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541030181-rdvb": {
+      "sessionId": "PAY-20260928-006",
+      "previousState": "PARTIALLY_PAID",
+      "newState": "COMPLETED",
+      "note": "Session overall status automatically updated to COMPLETED",
+      "id": "AUD-1790541030181-rdvb",
+      "timestamp": "2026-09-27T20:30:30.181Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541030181-zqp8": {
+      "sessionId": "PAY-20260928-006",
+      "installmentId": "PAY-20260928-006-INS-4",
+      "installmentSequence": 4,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790541030181-zqp8",
+      "timestamp": "2026-09-27T20:30:30.181Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541039717-tcs0": {
+      "sessionId": "PAY-20260928-007",
+      "newState": "DRAFT",
+      "note": "Session created with 4 installments (EQUAL)",
+      "id": "AUD-1790541039717-tcs0",
+      "timestamp": "2026-09-27T20:30:39.717Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541043999-k0a3": {
+      "sessionId": "PAY-20260928-007",
+      "previousState": "ACTIVE",
+      "newState": "PARTIALLY_PAID",
+      "note": "Session overall status automatically updated to PARTIALLY_PAID",
+      "id": "AUD-1790541043999-k0a3",
+      "timestamp": "2026-09-27T20:30:43.999Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541043999-k0zf": {
+      "sessionId": "PAY-20260928-007",
+      "installmentId": "PAY-20260928-007-INS-1",
+      "installmentSequence": 1,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790541043999-k0zf",
+      "timestamp": "2026-09-27T20:30:43.999Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541047049-9bjj": {
+      "sessionId": "PAY-20260928-007",
+      "installmentId": "PAY-20260928-007-INS-2",
+      "installmentSequence": 2,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790541047049-9bjj",
+      "timestamp": "2026-09-27T20:30:47.049Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541049749-63vj": {
+      "sessionId": "PAY-20260928-007",
+      "installmentId": "PAY-20260928-007-INS-3",
+      "installmentSequence": 3,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790541049749-63vj",
+      "timestamp": "2026-09-27T20:30:49.749Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541052232-udjj": {
+      "sessionId": "PAY-20260928-007",
+      "previousState": "PARTIALLY_PAID",
+      "newState": "COMPLETED",
+      "note": "Session overall status automatically updated to COMPLETED",
+      "id": "AUD-1790541052232-udjj",
+      "timestamp": "2026-09-27T20:30:52.232Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541052232-p3ie": {
+      "sessionId": "PAY-20260928-007",
+      "installmentId": "PAY-20260928-007-INS-4",
+      "installmentSequence": 4,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790541052232-p3ie",
+      "timestamp": "2026-09-27T20:30:52.232Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541094023-k1t6": {
+      "sessionId": "PAY-20260928-008",
+      "newState": "DRAFT",
+      "note": "Session created with 4 installments (EQUAL)",
+      "id": "AUD-1790541094023-k1t6",
+      "timestamp": "2026-09-27T20:31:34.023Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541097632-yys0": {
+      "sessionId": "PAY-20260928-008",
+      "previousState": "ACTIVE",
+      "newState": "PARTIALLY_PAID",
+      "note": "Session overall status automatically updated to PARTIALLY_PAID",
+      "id": "AUD-1790541097632-yys0",
+      "timestamp": "2026-09-27T20:31:37.632Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541097632-8yq4": {
+      "sessionId": "PAY-20260928-008",
+      "installmentId": "PAY-20260928-008-INS-1",
+      "installmentSequence": 1,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790541097632-8yq4",
+      "timestamp": "2026-09-27T20:31:37.632Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541100432-tax7": {
+      "sessionId": "PAY-20260928-008",
+      "installmentId": "PAY-20260928-008-INS-2",
+      "installmentSequence": 2,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790541100432-tax7",
+      "timestamp": "2026-09-27T20:31:40.432Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541103549-6005": {
+      "sessionId": "PAY-20260928-008",
+      "installmentId": "PAY-20260928-008-INS-3",
+      "installmentSequence": 3,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790541103549-6005",
+      "timestamp": "2026-09-27T20:31:43.549Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541106449-njw7": {
+      "sessionId": "PAY-20260928-008",
+      "previousState": "PARTIALLY_PAID",
+      "newState": "COMPLETED",
+      "note": "Session overall status automatically updated to COMPLETED",
+      "id": "AUD-1790541106449-njw7",
+      "timestamp": "2026-09-27T20:31:46.449Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790541106449-d9yi": {
+      "sessionId": "PAY-20260928-008",
+      "installmentId": "PAY-20260928-008-INS-4",
+      "installmentSequence": 4,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790541106449-d9yi",
+      "timestamp": "2026-09-27T20:31:46.449Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790584894225-egk5": {
+      "sessionId": "PAY-20260927-005",
+      "installmentId": "PAY-20260927-005-INS-3",
+      "installmentSequence": 3,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790584894225-egk5",
+      "timestamp": "2026-09-28T08:41:34.225Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790584896992-rw4z": {
+      "sessionId": "PAY-20260927-005",
+      "previousState": "PARTIALLY_PAID",
+      "newState": "COMPLETED",
+      "note": "Session overall status automatically updated to COMPLETED",
+      "id": "AUD-1790584896992-rw4z",
+      "timestamp": "2026-09-28T08:41:36.992Z",
+      "userId": "usr_1790499247832_szwkj"
+    },
+    "AUD-1790584896992-389y": {
+      "sessionId": "PAY-20260927-005",
+      "installmentId": "PAY-20260927-005-INS-4",
+      "installmentSequence": 4,
+      "previousState": "QR_READY",
+      "newState": "MANUALLY_CONFIRMED",
+      "confirmationMethod": "MANUAL",
+      "note": "State transitioned from QR_READY to MANUALLY_CONFIRMED",
+      "id": "AUD-1790584896992-389y",
+      "timestamp": "2026-09-28T08:41:36.992Z",
+      "userId": "usr_1790499247832_szwkj"
     }
   },
   "subscriptions": {},
-  "payments": {}
+  "payments": {
+    "pay_1790580172662_b7e27078": {
+      "id": "pay_1790580172662_b7e27078",
+      "userId": "usr_1790499247832_szwkj",
+      "providerPaymentId": "order_ThNBHmSJsB1cBx",
+      "amount": 99900,
+      "currency": "INR",
+      "status": "CREATED",
+      "provider": "razorpay_live_gateway",
+      "customerEmail": "anshumanparida913@gmail.com",
+      "customerName": "Anshuman Parida",
+      "customerPhone": "",
+      "createdAt": "2026-09-28T07:22:52.358Z"
+    },
+    "pay_1790585619480_a320fd03": {
+      "id": "pay_1790585619480_a320fd03",
+      "userId": "usr_1790499247832_szwkj",
+      "providerPaymentId": "order_ThOjBEVRazLKo7",
+      "amount": 99900,
+      "currency": "INR",
+      "status": "CREATED",
+      "provider": "razorpay_live_gateway",
+      "customerEmail": "anshumanparida913@gmail.com",
+      "customerName": "Anshuman Parida",
+      "customerPhone": "",
+      "createdAt": "2026-09-28T08:53:39.202Z"
+    }
+  },
+  "dailyUsages": {}
 }

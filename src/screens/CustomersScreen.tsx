@@ -441,7 +441,7 @@ export const CustomersScreen: React.FC<CustomersScreenProps> = ({
                 required
                 value={editingCustomer.name || ''}
                 onChange={(e) => setEditingCustomer({ ...editingCustomer, name: e.target.value })}
-                placeholder="e.g. Rahul Kumar"
+                placeholder="e.g. Customer Name"
                 className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-blue-500"
               />
             </div>
@@ -455,7 +455,7 @@ export const CustomersScreen: React.FC<CustomersScreenProps> = ({
                 required
                 value={editingCustomer.phone || ''}
                 onChange={(e) => setEditingCustomer({ ...editingCustomer, phone: e.target.value })}
-                placeholder="9876543210"
+                placeholder="e.g. 9876543210"
                 className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono focus:outline-hidden focus:ring-1 focus:ring-blue-500"
               />
             </div>

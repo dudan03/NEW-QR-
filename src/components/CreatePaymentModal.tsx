@@ -71,7 +71,7 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
   // Form states
   const [upiId, setUpiId] = useState(merchantProfile.upiId || '');
   const [payeeName, setPayeeName] = useState(merchantProfile.displayName || merchantProfile.businessName || '');
-  const [totalAmountStr, setTotalAmountStr] = useState('10000');
+  const [totalAmountStr, setTotalAmountStr] = useState('');
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>(initialCustomer?.id || '');
   const [customerName, setCustomerName] = useState(initialCustomer?.name || '');
   const [customerPhone, setCustomerPhone] = useState(initialCustomer?.phone || '');
@@ -562,7 +562,7 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
                         setCustomerName(e.target.value);
                         if (errors.customerName) setErrors({ ...errors, customerName: undefined });
                       }}
-                      placeholder="e.g. Rahul Kumar"
+                      placeholder="e.g. Customer Name"
                       className={`w-full h-9 px-3 text-xs rounded-xl border ${
                         errors.customerName
                           ? 'border-rose-500 ring-1 ring-rose-500 bg-rose-50/20'
@@ -588,7 +588,7 @@ export const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({
                         setCustomerPhone(e.target.value);
                         if (errors.customerPhone) setErrors({ ...errors, customerPhone: undefined });
                       }}
-                      placeholder="10-digit mobile (+91 ...)"
+                      placeholder="e.g. 9876543210"
                       className={`w-full h-9 px-3 text-xs rounded-xl border ${
                         errors.customerPhone
                           ? 'border-rose-500 ring-1 ring-rose-500 bg-rose-50/20'

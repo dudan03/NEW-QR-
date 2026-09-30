@@ -52,7 +52,6 @@ interface SettingsScreenProps {
   onOpenDeleteAccount: () => void;
   onOpenLegal: (tab: 'privacy' | 'terms' | 'data') => void;
   onSyncNow: () => void;
-  onResetDemo: () => void;
   onClearAllData: () => void;
   onOpenOnboarding: () => void;
   onRestoreBackup: (jsonStr: string) => void;
@@ -76,7 +75,6 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   onOpenDeleteAccount,
   onOpenLegal,
   onSyncNow,
-  onResetDemo,
   onClearAllData,
   onOpenOnboarding,
   onRestoreBackup,
@@ -338,7 +336,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
               required
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
-              placeholder="e.g. Ramesh Hardware Store"
+              placeholder="e.g. My Business / Store Name"
               className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
             />
           </div>
@@ -353,7 +351,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 required
                 value={upiId}
                 onChange={(e) => setUpiId(e.target.value)}
-                placeholder="merchant@okhdfcbank"
+                placeholder="e.g. merchant@okhdfcbank"
                 className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
               />
             </div>
@@ -366,7 +364,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="e.g. Ramesh Sharma"
+                placeholder="e.g. Merchant Name"
                 className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
               />
             </div>
@@ -381,7 +379,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="9876543210"
+                placeholder="e.g. 9876543210"
                 className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
               />
             </div>
@@ -394,7 +392,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="shop@example.com"
+                placeholder="e.g. merchant@example.com"
                 className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
               />
             </div>
@@ -548,20 +546,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         </div>
       </div>
 
-      {/* Demo & Onboarding Helper Actions */}
+      {/* Onboarding Helper Action */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs space-y-2 text-xs">
-        <button
-          type="button"
-          onClick={onResetDemo}
-          className="w-full h-10 px-3 rounded-xl border border-amber-200 dark:border-amber-800/80 bg-amber-50/50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 font-semibold flex items-center justify-between hover:bg-amber-100 transition-colors"
-        >
-          <span className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-600" />
-            <span>{t.actions.resetDemo}</span>
-          </span>
-          <span className="text-[10px] text-amber-600 font-normal">Rahul Kumar ₹10k plan</span>
-        </button>
-
         <button
           type="button"
           onClick={onOpenOnboarding}

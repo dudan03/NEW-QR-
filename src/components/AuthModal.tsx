@@ -38,11 +38,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Google Account details & customize fallback
-  const [customEmail, setCustomEmail] = useState('anshumanparida913@gmail.com');
-  const [customName, setCustomName] = useState('Anshuman Parida');
-  const [showAdvanced, setShowAdvanced] = useState(false);
-
   if (!isOpen) return null;
 
   // Google Login Handler (Firebase GoogleAuthProvider popup with graceful fallback)
@@ -51,10 +46,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setLoading(true);
       setError(null);
 
-      let email = customEmail.trim() || 'anshumanparida913@gmail.com';
-      let name = customName.trim() || 'Anshuman Parida';
+      let email = 'merchant@splitupiqr.in';
+      let name = 'Merchant User';
       let avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces';
-      let googleId = `google-user-${email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+      let googleId = `google-user-${Date.now()}`;
 
       // If active Firebase configuration is provided, invoke official Google Sign-In popup
       const auth = getFirebaseAuth();
@@ -215,44 +210,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               )}
               <span>{loading ? 'Signing In...' : t.continueWithGoogle}</span>
             </button>
-
-            {/* Account Switcher / Customizer */}
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-center">
-              <button
-                type="button"
-                onClick={() => setShowAdvanced(!showAdvanced)}
-                className="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition cursor-pointer"
-              >
-                {showAdvanced ? 'Hide Custom Account Details' : 'Account Details / Switch Account'}
-              </button>
-
-              {showAdvanced && (
-                <div className="mt-3 text-left space-y-2.5 animate-in fade-in duration-150 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                      Google Email
-                    </label>
-                    <input
-                      type="email"
-                      value={customEmail}
-                      onChange={(e) => setCustomEmail(e.target.value)}
-                      className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                      Merchant Name
-                    </label>
-                    <input
-                      type="text"
-                      value={customName}
-                      onChange={(e) => setCustomName(e.target.value)}
-                      className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         )}
 

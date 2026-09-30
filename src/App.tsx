@@ -327,10 +327,6 @@ export default function App() {
     }
   };
 
-  const hasDemoSession = useMemo(() => {
-    return sessions.some((s) => s.isDemo);
-  }, [sessions]);
-
   // Count unconfirmed installments in active sessions for the bottom nav badge
   const pendingInstallmentsCount = useMemo(() => {
     return sessions
@@ -366,16 +362,6 @@ export default function App() {
     setSettings(updated);
     StorageService.saveSettings(updated);
     setIsOnboardingOpen(false);
-  };
-
-  // Handler: Load / Seed Demo Data
-  const handleLoadDemo = () => {
-    NotificationScheduler.clearDismissedAlerts();
-    setDismissedAlertIds([]);
-    const demo = StorageService.seedDemoData();
-    refreshAllData();
-    setSelectedSession(demo);
-    triggerSync();
   };
 
   // Handler: Create New Payment Session (PRD Section 8, 9, 10, 16, 18)
@@ -745,8 +731,6 @@ export default function App() {
           setInitialCustomerForPayment(null);
           setIsCreateOpen(true);
         }}
-        hasDemoSession={hasDemoSession}
-        onLoadDemo={handleLoadDemo}
         user={user}
         onOpenAuth={() => setIsAuthOpen(true)}
         onLogout={handleLogout}
@@ -826,10 +810,8 @@ export default function App() {
               setSelectedSession(sess);
               setIsDetailOpen(true);
             }}
-            onLoadDemo={handleLoadDemo}
             onOpenCustomers={() => setActiveTab('customers')}
             onOpenReports={() => setActiveTab('reports')}
-            hasDemoSession={hasDemoSession}
             analytics={analytics}
             isPro={isPro}
             subscription={subscription}
@@ -917,7 +899,6 @@ export default function App() {
             onOpenDeleteAccount={() => setIsDeleteAccountOpen(true)}
             onOpenLegal={(tab) => setLegalTab(tab)}
             onSyncNow={triggerSync}
-            onResetDemo={handleLoadDemo}
             onClearAllData={handleClearAllData}
             onOpenOnboarding={() => setIsOnboardingOpen(true)}
             onRestoreBackup={handleRestoreBackupJson}

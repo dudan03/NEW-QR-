@@ -96,7 +96,7 @@ export type SyncStatusState = 'synced' | 'syncing' | 'offline' | 'error';
 
 export interface UserAccount {
   id: string;
-  googleId: string;
+  googleId?: string;
   name: string;
   email: string;
   avatarUrl?: string;
@@ -108,7 +108,7 @@ export interface UserAccount {
   isPro?: boolean;
   createdAt: string;
   lastLoginAt: string;
-  businessId: string;
+  businessId?: string;
 }
 
 export interface BusinessProfile {

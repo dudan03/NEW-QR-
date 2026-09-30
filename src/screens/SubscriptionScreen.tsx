@@ -178,10 +178,6 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
   // Initiate checkout flow
   const handleStartCheckout = () => {
-    if (!user) {
-      onOpenAuth();
-      return;
-    }
     setFormError(null);
     setPaymentStatus(null);
     setIsCheckoutOpen(true);
@@ -190,12 +186,13 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   // Launch Razorpay Live Payment Gateway
   const handleLaunchRazorpayGateway = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
-      onOpenAuth();
-      return;
-    }
     if (!firstName.trim()) {
       setFormError('Please enter your first name.');
+      return;
+    }
+    const targetEmail = (email || user?.email || '').trim();
+    if (!targetEmail || !targetEmail.includes('@')) {
+      setFormError('Please enter a valid email address for your Pro plan invoice and account.');
       return;
     }
 
@@ -203,11 +200,13 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       setIsProcessing(true);
       setFormError(null);
 
+      const targetUserId = user?.id || 'default-merchant';
+
       // 1. Create order on server
-      const orderData = await ApiService.createSubscriptionCheckout(user.id, {
+      const orderData = await ApiService.createSubscriptionCheckout(targetUserId, {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        email: email || user.email,
+        email: targetEmail,
         phone: phone.trim(),
       });
 
@@ -237,11 +236,11 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         order_id: (orderData as any).razorpayOrderId || undefined,
         prefill: {
           name: `${firstName.trim()} ${lastName.trim()}`.trim(),
-          email: email || user.email,
+          email: targetEmail,
           contact: phone.trim() || undefined,
         },
         notes: {
-          userId: user.id,
+          userId: targetUserId,
           plan: 'PRO',
           duration: '6_CALENDAR_MONTHS',
           orderId: orderData.orderId,
@@ -268,7 +267,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             const signature = response.razorpay_signature || orderData.checkoutToken;
 
             // 4. Verify payment cryptographically with backend server
-            const verifyRes = await ApiService.verifySubscriptionPayment(user.id, {
+            const verifyRes = await ApiService.verifySubscriptionPayment(targetUserId, {
               orderId: orderData.orderId,
               providerPaymentId,
               signature,
@@ -288,6 +287,18 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 amount: '₹999',
               });
               StorageService.saveSubscription(verifyRes.subscription);
+
+              if (!user) {
+                const autoUser: UserAccount = {
+                  id: targetUserId,
+                  name: `${firstName.trim()} ${lastName.trim()}`.trim() || 'Pro Merchant',
+                  email: targetEmail,
+                  plan: 'PRO',
+                  createdAt: new Date().toISOString(),
+                  lastLoginAt: new Date().toISOString(),
+                };
+                StorageService.saveUser(autoUser);
+              }
 
               try {
                 confetti({
@@ -350,13 +361,13 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
   // Direct manual activation fallback (for sandbox / test keys or popup blockers)
   const handleDirectVerify = async () => {
-    if (!user) return;
     try {
       setIsProcessing(true);
       setFormError(null);
+      const targetUserId = user?.id || 'default-merchant';
       const orderId = activeOrderId || `order_pro_${Date.now()}`;
       const providerPaymentId = `pay_rzp_${Date.now()}_direct`;
-      const verifyRes = await ApiService.verifySubscriptionPayment(user.id, {
+      const verifyRes = await ApiService.verifySubscriptionPayment(targetUserId, {
         orderId,
         providerPaymentId,
         signature: `sig_direct_${Date.now()}`,
@@ -743,7 +754,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                       required
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="e.g. Ramesh"
+                      placeholder="e.g. First Name"
                       className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
                     />
                   </div>
@@ -755,22 +766,49 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                       type="text"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      placeholder="e.g. Sharma"
+                      placeholder="e.g. Last Name"
                       className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
                     />
                   </div>
                 </div>
 
+                {!user && (
+                  <div className="p-3 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 flex items-center justify-between gap-2">
+                    <span className="text-[11px] text-blue-800 dark:text-blue-300 font-medium">
+                      Have a Google account? Sign in for 1-click license binding.
+                    </span>
+                    <button
+                      type="button"
+                      onClick={onOpenAuth}
+                      className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-bold shrink-0 cursor-pointer shadow-2xs"
+                    >
+                      Sign In
+                    </button>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-slate-600 dark:text-slate-400 font-semibold mb-1">
-                    Google Account Email (Pro Bound)
+                    Email Address (Pro Plan License & Invoices) *
                   </label>
                   <input
                     type="email"
-                    readOnly
+                    required
                     value={email}
-                    className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 font-medium cursor-not-allowed"
+                    onChange={(e) => setEmail(e.target.value)}
+                    readOnly={Boolean(user?.email)}
+                    placeholder="e.g. merchant@example.com"
+                    className={`w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-hidden ${
+                      user?.email
+                        ? 'bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 cursor-not-allowed'
+                        : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white'
+                    }`}
                   />
+                  {!user?.email && (
+                    <p className="text-[10px] text-slate-400 mt-1">
+                      Your Razorpay payment receipt and Pro plan will be linked to this email.
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -781,7 +819,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="9876543210"
+                    placeholder="e.g. 9876543210"
                     className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
                   />
                 </div>

@@ -143,10 +143,10 @@ app.get('/api/health', (_req, res) => {
 app.post('/api/auth/google', (req, res) => {
   const db = loadDB();
   const {
-    email = 'anshumanparida913@gmail.com',
-    name = 'Anshuman Parida',
+    email = 'merchant@splitupiqr.in',
+    name = 'Merchant User',
     avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces',
-    googleId = 'google-sub-795426317946',
+    googleId = `google-${Date.now()}`,
   } = req.body;
 
   // Find user by email or googleId
@@ -172,16 +172,16 @@ app.post('/api/auth/google', (req, res) => {
     };
     db.users[userId] = user;
 
-    // Create default business profile
+    // Create default business profile with clean empty fields
     const business = {
       id: businessId,
       userId,
-      businessName: `${name}'s Business`,
+      businessName: `${name}'s Store`,
       displayName: name,
-      upiId: `${email.split('@')[0]}@upi`,
-      phone: '+91 98765 43210',
+      upiId: '',
+      phone: '',
       email,
-      address: 'Bhubaneswar, Odisha, India',
+      address: '',
       invoicePrefix: 'INV',
       receiptFooter: 'Thank you for your business! Merchant-generated payment record.',
       currency: 'INR',
@@ -355,17 +355,39 @@ const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'z9xQ6RbSff1h1V2g
 app.post('/api/subscription/checkout', async (req, res) => {
   const db = loadDB();
   const userId = getUserId(req);
-  const user = db.users[userId];
+  let user = db.users[userId];
 
-  if (!user) {
-    return res.status(401).json({ error: 'Authentication required before purchasing Pro' });
-  }
-
-  const { firstName, lastName = '', phone = '', email = user.email } = req.body;
+  const { firstName = '', lastName = '', phone = '', email = '' } = req.body;
   if (!firstName || !firstName.trim()) {
     return res.status(400).json({ error: 'First name is required for checkout' });
   }
 
+  // Gracefully locate or auto-provision user account if not in db.users
+  const userEmail = email.trim() || user?.email || (userId.includes('@') ? userId : 'merchant@splitupiqr.in');
+  if (!user) {
+    if (userEmail) {
+      user = Object.values(db.users).find(
+        (u: any) => u.email?.toLowerCase() === userEmail.toLowerCase()
+      );
+    }
+    if (!user) {
+      const now = new Date().toISOString();
+      const resolvedUserId = userId && userId !== 'default-merchant' ? userId : `usr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      user = {
+        id: resolvedUserId,
+        name: `${firstName.trim()} ${lastName.trim()}`.trim() || 'Merchant User',
+        email: userEmail,
+        plan: 'FREE',
+        createdAt: now,
+        lastLoginAt: now,
+        businessId: `biz_${Date.now()}`,
+      };
+      db.users[user.id] = user;
+      saveDB(db);
+    }
+  }
+
+  const effectiveUserId = user.id;
   const now = new Date();
   const nowIso = now.toISOString();
   const orderId = `order_pro_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
@@ -373,7 +395,7 @@ app.post('/api/subscription/checkout', async (req, res) => {
 
   // Pre-generate cryptographic challenge token with server secret
   const secretKey = process.env.PAYMENT_PROVIDER_SECRET_KEY || 'split_upi_qr_prod_secret_salt_2026';
-  const signaturePayload = `${orderId}|${amountPaise}|INR|${userId}|${nowIso}`;
+  const signaturePayload = `${orderId}|${amountPaise}|INR|${effectiveUserId}|${nowIso}`;
   const checkoutSignature = crypto
     .createHmac('sha256', secretKey)
     .update(signaturePayload)
@@ -394,9 +416,9 @@ app.post('/api/subscription/checkout', async (req, res) => {
         currency: 'INR',
         receipt: orderId.substring(0, 40),
         notes: {
-          userId,
+          userId: effectiveUserId,
           customerName: `${firstName.trim()} ${lastName.trim()}`.trim(),
-          customerEmail: email,
+          customerEmail: userEmail,
           plan: 'PRO',
         },
       }),
@@ -414,13 +436,13 @@ app.post('/api/subscription/checkout', async (req, res) => {
   // Record initial payment record in CREATED state
   const paymentRecord = {
     id: `pay_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
-    userId,
+    userId: effectiveUserId,
     providerPaymentId: razorpayOrderId || orderId,
     amount: amountPaise,
     currency: 'INR',
     status: 'CREATED',
     provider: 'razorpay_live_gateway',
-    customerEmail: email,
+    customerEmail: userEmail,
     customerName: `${firstName.trim()} ${lastName.trim()}`.trim(),
     customerPhone: phone,
     createdAt: nowIso,
@@ -439,7 +461,7 @@ app.post('/api/subscription/checkout', async (req, res) => {
     durationMonths: 6,
     customer: {
       name: paymentRecord.customerName,
-      email,
+      email: userEmail,
       phone,
     },
     checkoutToken: checkoutSignature,
@@ -451,17 +473,40 @@ app.post('/api/subscription/checkout', async (req, res) => {
 app.post('/api/subscription/verify', (req, res) => {
   const db = loadDB();
   const userId = getUserId(req);
-  const user = db.users[userId];
+  let user = db.users[userId];
 
-  if (!user) {
-    return res.status(401).json({ error: 'Authentication required' });
-  }
-
-  const { orderId, providerPaymentId, signature, razorpayOrderId, timestamp } = req.body;
+  const { orderId, providerPaymentId, signature, razorpayOrderId, timestamp, email } = req.body;
 
   if (!orderId || !providerPaymentId) {
     return res.status(400).json({ error: 'Missing payment identifiers for verification' });
   }
+
+  // Gracefully locate or auto-create user if missing in db.users
+  const userEmail = email || user?.email || 'merchant@splitupiqr.in';
+  if (!user) {
+    if (userEmail) {
+      user = Object.values(db.users).find(
+        (u: any) => u.email?.toLowerCase() === userEmail.toLowerCase()
+      );
+    }
+    if (!user) {
+      const now = new Date().toISOString();
+      const resolvedUserId = userId && userId !== 'default-merchant' ? userId : `usr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      user = {
+        id: resolvedUserId,
+        name: 'Merchant User',
+        email: userEmail,
+        plan: 'FREE',
+        createdAt: now,
+        lastLoginAt: now,
+        businessId: `biz_${Date.now()}`,
+      };
+      db.users[user.id] = user;
+      saveDB(db);
+    }
+  }
+
+  const effectiveUserId = user.id;
 
   // 1. Idempotency Check (PRD Section 10 & 16):
   // Check if this providerPaymentId has ALREADY been verified and activated
@@ -488,7 +533,7 @@ app.post('/api/subscription/verify', (req, res) => {
   const secretKey = process.env.PAYMENT_PROVIDER_SECRET_KEY || 'split_upi_qr_prod_secret_salt_2026';
   const expectedHash = crypto
     .createHmac('sha256', secretKey)
-    .update(`${orderId}|99900|INR|${userId}|${timestamp || ''}`)
+    .update(`${orderId}|99900|INR|${effectiveUserId}|${timestamp || ''}`)
     .digest('hex');
 
   // Also verify Razorpay HMAC signature if razorpayOrderId is provided
@@ -527,7 +572,7 @@ app.post('/api/subscription/verify', (req, res) => {
   // If user already has an active Pro subscription, extend from the current expiry date!
   let startDate = now;
   const currentActiveSub = Object.values(db.subscriptions).find(
-    (s: any) => s.userId === userId && s.status === 'ACTIVE' && new Date(s.expiryDate).getTime() > now.getTime()
+    (s: any) => s.userId === effectiveUserId && s.status === 'ACTIVE' && new Date(s.expiryDate).getTime() > now.getTime()
   ) as any;
 
   if (currentActiveSub) {
@@ -541,7 +586,7 @@ app.post('/api/subscription/verify', (req, res) => {
   const subId = `sub_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
   const subscription = {
     id: subId,
-    userId,
+    userId: effectiveUserId,
     plan: 'PRO',
     status: 'ACTIVE',
     amount: 99900, // 99,900 paise
@@ -565,7 +610,7 @@ app.post('/api/subscription/verify', (req, res) => {
   if (!payment) {
     payment = {
       id: `pay_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
-      userId,
+      userId: effectiveUserId,
       providerPaymentId,
       amount: 99900,
       currency: 'INR',
@@ -582,7 +627,7 @@ app.post('/api/subscription/verify', (req, res) => {
 
   // 6. Update user account plan & session
   user.plan = 'PRO';
-  db.users[userId] = user;
+  db.users[effectiveUserId] = user;
 
   saveDB(db);
 

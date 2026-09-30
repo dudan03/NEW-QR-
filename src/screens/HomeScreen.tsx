@@ -37,10 +37,8 @@ interface HomeScreenProps {
   language: SupportedLanguage;
   onOpenCreate: () => void;
   onSelectSession: (session: PaymentSession) => void;
-  onLoadDemo: () => void;
   onOpenCustomers: () => void;
   onOpenReports: () => void;
-  hasDemoSession: boolean;
   isPro?: boolean;
   subscription?: Subscription | null;
   dailyUsage?: UsageSummary | null;
@@ -64,10 +62,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   language,
   onOpenCreate,
   onSelectSession,
-  onLoadDemo,
   onOpenCustomers,
   onOpenReports,
-  hasDemoSession,
   isPro = false,
   subscription,
   dailyUsage,
@@ -880,32 +876,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
-            </div>
-          )}
-
-          {/* Demo helper card if demo not loaded */}
-          {!hasDemoSession && (
-            <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-amber-900 dark:text-amber-200">
-                    Explore with Sample Demo Data
-                  </h4>
-                  <p className="text-[11px] text-amber-700 dark:text-amber-300">
-                    Load ₹10,000 split into 4x ₹2,500 installments (Rahul Kumar)
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={onLoadDemo}
-                className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl shadow-xs shrink-0 active:scale-95 transition cursor-pointer"
-              >
-                {t.actions.tryDemo}
-              </button>
             </div>
           )}
 

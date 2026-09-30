@@ -45,50 +45,6 @@ export const GoogleAuthGate: React.FC<GoogleAuthGateProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [verificationStep, setVerificationStep] = useState<string | null>(null);
 
-  // Default / customizable credentials
-  const [customEmail, setCustomEmail] = useState('anshumanparida913@gmail.com');
-  const [customName, setCustomName] = useState('Anshuman Parida');
-  const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
-
-  // Initialize Google Identity Services if available in window
-  useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
-      try {
-        (window as any).google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: (response: any) => {
-            if (response.credential) {
-              const decoded = parseGoogleJwt(response.credential);
-              if (decoded?.email) {
-                performLogin({
-                  email: decoded.email,
-                  name: decoded.name || 'Merchant',
-                  avatarUrl: decoded.picture || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces',
-                  googleId: decoded.sub || `google-${Date.now()}`,
-                });
-              }
-            }
-          },
-          auto_select: false,
-          cancel_on_tap_outside: true,
-        });
-
-        const btnContainer = document.getElementById('gsi-button-container');
-        if (btnContainer) {
-          (window as any).google.accounts.id.renderButton(btnContainer, {
-            theme: 'filled_blue',
-            size: 'large',
-            text: 'continue_with',
-            shape: 'pill',
-            width: 320,
-          });
-        }
-      } catch (e) {
-        console.warn('GIS initialization notice:', e);
-      }
-    }
-  }, []);
-
   // Internal common login performer that works offline and online
   const performLogin = async (credentials: {
     email: string;
@@ -147,12 +103,12 @@ export const GoogleAuthGate: React.FC<GoogleAuthGateProps> = ({
       setError(null);
       setVerificationStep('Connecting to Google Identity Services...');
 
-      let email = customEmail.trim() || 'anshumanparida913@gmail.com';
-      let name = customName.trim() || 'Anshuman Parida';
+      let email = 'merchant@splitupiqr.in';
+      let name = 'Merchant User';
       let avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces';
-      let googleId = `google-user-${email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+      let googleId = `google-user-${Date.now()}`;
 
-      // 1. Try Firebase Popup if available
+      // 1. Try Firebase Google Popup if available
       const auth = getFirebaseAuth();
       if (auth) {
         try {
@@ -262,9 +218,6 @@ export const GoogleAuthGate: React.FC<GoogleAuthGateProps> = ({
 
           {/* Primary Google Sign-In Action */}
           <div className="space-y-3">
-            {/* Native GIS Button Container if available */}
-            <div id="gsi-button-container" className="flex justify-center empty:hidden"></div>
-
             <button
               type="button"
               onClick={handleGoogleLogin}
@@ -274,7 +227,7 @@ export const GoogleAuthGate: React.FC<GoogleAuthGateProps> = ({
               {loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
-                  <span>Verifying Account...</span>
+                  <span>Connecting to Google...</span>
                 </>
               ) : (
                 <>
@@ -301,67 +254,6 @@ export const GoogleAuthGate: React.FC<GoogleAuthGateProps> = ({
                 </>
               )}
             </button>
-
-            {/* Instant 1-Click Quick Access Button */}
-            <button
-              type="button"
-              onClick={() => {
-                performLogin({
-                  email: customEmail.trim() || 'anshumanparida913@gmail.com',
-                  name: customName.trim() || 'Anshuman Parida',
-                  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces',
-                  googleId: `google-verified-${Date.now()}`,
-                });
-              }}
-              disabled={loading}
-              className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-98 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 transition cursor-pointer disabled:opacity-50"
-            >
-              <Zap className="w-4 h-4 text-amber-300" />
-              <span>1-Click Instant Login ({customEmail.split('@')[0]})</span>
-            </button>
-
-            {/* Quick account switcher toggle */}
-            <div className="pt-2 text-center">
-              <button
-                type="button"
-                onClick={() => setShowAccountSwitcher(!showAccountSwitcher)}
-                className="text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer"
-              >
-                {showAccountSwitcher ? 'Hide Account Details' : 'Change Account / Custom Google Email'}
-              </button>
-
-              {showAccountSwitcher && (
-                <div className="mt-3 p-4 bg-slate-950/80 rounded-2xl border border-slate-800 text-left space-y-3 animate-in fade-in">
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-300 mb-1 flex items-center gap-1">
-                      <Mail className="w-3 h-3 text-blue-400" />
-                      <span>Google Account Email</span>
-                    </label>
-                    <input
-                      type="email"
-                      value={customEmail}
-                      onChange={(e) => setCustomEmail(e.target.value)}
-                      placeholder="merchant@gmail.com"
-                      className="w-full h-10 px-3 rounded-xl border border-slate-700 bg-slate-900 text-white text-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-300 mb-1 flex items-center gap-1">
-                      <User className="w-3 h-3 text-blue-400" />
-                      <span>Merchant Full Name</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={customName}
-                      onChange={(e) => setCustomName(e.target.value)}
-                      placeholder="e.g. Ramesh Sharma"
-                      className="w-full h-10 px-3 rounded-xl border border-slate-700 bg-slate-900 text-white text-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Features Preview Box */}

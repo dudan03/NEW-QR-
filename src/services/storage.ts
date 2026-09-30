@@ -149,26 +149,21 @@ export class StorageService {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.SESSIONS);
       if (!data) return [];
-      const sessions: PaymentSession[] = JSON.parse(data);
-      let modified = false;
-      for (const s of sessions) {
-        if (s.id === 'PAY-DEMO-2026-001' && s.installments) {
-          const inst3 = s.installments.find((i) => i.sequence === 3);
-          if (inst3 && !inst3.dueDate) {
-            inst3.dueDate = new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString();
-            modified = true;
-          }
-          const inst4 = s.installments.find((i) => i.sequence === 4);
-          if (inst4 && !inst4.dueDate) {
-            inst4.dueDate = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
-            modified = true;
-          }
-        }
+      const rawSessions: PaymentSession[] = JSON.parse(data);
+      // Automatically purge any demo sessions or Rahul Kumar records
+      const cleanSessions = rawSessions.filter((s) => {
+        if (!s) return false;
+        if (s.isDemo) return false;
+        if (s.id === 'PAY-DEMO-2026-001' || s.id === 'PAY-20260924-004') return false;
+        if (s.customerId === 'cust-demo-rahul') return false;
+        if ((s.customerName || '').toLowerCase().includes('rahul kumar')) return false;
+        return true;
+      });
+
+      if (cleanSessions.length !== rawSessions.length) {
+        this.saveSessions(cleanSessions);
       }
-      if (modified) {
-        this.saveSessions(sessions);
-      }
-      return sessions;
+      return cleanSessions;
     } catch {
       return [];
     }
@@ -176,7 +171,15 @@ export class StorageService {
 
   static saveSessions(sessions: PaymentSession[]): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(sessions));
+      const clean = sessions.filter((s) => {
+        if (!s) return false;
+        if (s.isDemo) return false;
+        if (s.id === 'PAY-DEMO-2026-001' || s.id === 'PAY-20260924-004') return false;
+        if (s.customerId === 'cust-demo-rahul') return false;
+        if ((s.customerName || '').toLowerCase().includes('rahul kumar')) return false;
+        return true;
+      });
+      localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(clean));
     } catch (e) {
       console.error('Failed to save sessions', e);
     }
@@ -206,7 +209,20 @@ export class StorageService {
   static getCustomers(): Customer[] {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.CUSTOMERS);
-      return data ? JSON.parse(data) : [];
+      if (!data) return [];
+      const rawCustomers: Customer[] = JSON.parse(data);
+      // Automatically purge Rahul Kumar demo customer
+      const cleanCustomers = rawCustomers.filter((c) => {
+        if (!c) return false;
+        if (c.id === 'cust-demo-rahul') return false;
+        if ((c.name || '').toLowerCase().includes('rahul kumar')) return false;
+        return true;
+      });
+
+      if (cleanCustomers.length !== rawCustomers.length) {
+        this.saveCustomers(cleanCustomers);
+      }
+      return cleanCustomers;
     } catch {
       return [];
     }
@@ -214,7 +230,13 @@ export class StorageService {
 
   static saveCustomers(customers: Customer[]): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(customers));
+      const clean = customers.filter((c) => {
+        if (!c) return false;
+        if (c.id === 'cust-demo-rahul') return false;
+        if ((c.name || '').toLowerCase().includes('rahul kumar')) return false;
+        return true;
+      });
+      localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(clean));
     } catch (e) {
       console.error('Failed to save customers', e);
     }
@@ -474,148 +496,6 @@ export class StorageService {
         note: `Session overall status automatically updated to ${nextStatus}`,
       });
     }
-  }
-
-  // ---------------- SEED DEMO DATA ----------------
-  static seedDemoData(): PaymentSession {
-    const demoSessionId = 'PAY-DEMO-2026-001';
-    const totalAmountPaise = 1000000; // ₹10,000
-    const installmentAmountPaise = 250000; // ₹2,500
-    const upiId = 'demo@upi';
-    const payeeName = 'Sharma Electronics & Services';
-
-    const now = new Date();
-    const twoHoursAgo = new Date(now.getTime() - 2 * 3600 * 1000).toISOString();
-    const oneHourAgo = new Date(now.getTime() - 1 * 3600 * 1000).toISOString();
-
-    // Ensure Rahul Kumar exists as a CRM customer
-    const customers = this.getCustomers();
-    let demoCustomer = customers.find((c) => c.name.toLowerCase() === 'rahul kumar');
-    if (!demoCustomer) {
-      demoCustomer = {
-        id: 'cust-demo-rahul',
-        name: 'Rahul Kumar',
-        phone: '+91 98765 43210',
-        email: 'rahul.kumar@example.com',
-        address: 'Bapuji Nagar, Bhubaneswar',
-        notes: 'Frequent electronics purchaser; prefers 4 installment UPI splits.',
-        createdAt: twoHoursAgo,
-        updatedAt: twoHoursAgo,
-      };
-      customers.unshift(demoCustomer);
-      this.saveCustomers(customers);
-    }
-
-    const installments: Installment[] = [
-      {
-        id: `${demoSessionId}-INS-1`,
-        sessionId: demoSessionId,
-        sequence: 1,
-        amountPaise: installmentAmountPaise,
-        paymentUri: generateUpiUri({
-          upiId,
-          payeeName,
-          amountPaise: installmentAmountPaise,
-          note: 'Demo Installment 1 of 4',
-          transactionRef: `${demoSessionId}-1`,
-        }),
-        status: 'MANUALLY_CONFIRMED',
-        confirmationMethod: 'MANUAL',
-        createdAt: twoHoursAgo,
-        updatedAt: twoHoursAgo,
-        confirmedAt: twoHoursAgo,
-        dueDate: new Date(now.getTime() - 14 * 24 * 3600 * 1000).toISOString(),
-        note: 'First installment verified via merchant banking app',
-      },
-      {
-        id: `${demoSessionId}-INS-2`,
-        sessionId: demoSessionId,
-        sequence: 2,
-        amountPaise: installmentAmountPaise,
-        paymentUri: generateUpiUri({
-          upiId,
-          payeeName,
-          amountPaise: installmentAmountPaise,
-          note: 'Demo Installment 2 of 4',
-          transactionRef: `${demoSessionId}-2`,
-        }),
-        status: 'MANUALLY_CONFIRMED',
-        confirmationMethod: 'MANUAL',
-        createdAt: twoHoursAgo,
-        updatedAt: oneHourAgo,
-        confirmedAt: oneHourAgo,
-        dueDate: new Date(now.getTime() - 7 * 24 * 3600 * 1000).toISOString(),
-        note: 'Second installment confirmed after UPI credit alert',
-      },
-      {
-        id: `${demoSessionId}-INS-3`,
-        sessionId: demoSessionId,
-        sequence: 3,
-        amountPaise: installmentAmountPaise,
-        paymentUri: generateUpiUri({
-          upiId,
-          payeeName,
-          amountPaise: installmentAmountPaise,
-          note: 'Demo Installment 3 of 4',
-          transactionRef: `${demoSessionId}-3`,
-        }),
-        status: 'PENDING',
-        confirmationMethod: 'NONE',
-        createdAt: twoHoursAgo,
-        updatedAt: now.toISOString(),
-        dueDate: new Date(now.getTime() - 2 * 24 * 3600 * 1000).toISOString(), // 2 days overdue
-        note: 'Awaiting customer scan and bank credit verification',
-      },
-      {
-        id: `${demoSessionId}-INS-4`,
-        sessionId: demoSessionId,
-        sequence: 4,
-        amountPaise: installmentAmountPaise,
-        paymentUri: generateUpiUri({
-          upiId,
-          payeeName,
-          amountPaise: installmentAmountPaise,
-          note: 'Demo Installment 4 of 4',
-          transactionRef: `${demoSessionId}-4`,
-        }),
-        status: 'QR_READY',
-        confirmationMethod: 'NONE',
-        createdAt: twoHoursAgo,
-        updatedAt: twoHoursAgo,
-        dueDate: new Date(now.getTime() + 7 * 24 * 3600 * 1000).toISOString(),
-      },
-    ];
-
-    const demoSession: PaymentSession = {
-      id: demoSessionId,
-      customerId: demoCustomer.id,
-      customerName: 'Rahul Kumar',
-      customerPhone: '+91 98765 43210',
-      upiId,
-      payeeName,
-      totalAmountPaise,
-      invoiceId: 'INV-2026-089',
-      notes: 'Agreed on 4 bi-weekly UPI payments for electronics purchase.',
-      splitMethod: 'EQUAL',
-      status: 'PARTIALLY_PAID',
-      installments,
-      dueDate: new Date(now.getTime() + 7 * 24 * 3600 * 1000).toISOString(),
-      isDemo: true,
-      createdAt: twoHoursAgo,
-      updatedAt: now.toISOString(),
-    };
-
-    const currentSessions = this.getSessions().filter((s) => s.id !== demoSessionId);
-    currentSessions.unshift(demoSession);
-    this.saveSessions(currentSessions);
-
-    this.recordAuditEvent({
-      sessionId: demoSessionId,
-      newState: 'DRAFT',
-      note: 'Demo session initialized with 4 installments',
-    });
-
-    return demoSession;
   }
 
   // ---------------- ANALYTICS ----------------

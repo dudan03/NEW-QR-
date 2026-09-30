@@ -26,8 +26,6 @@ interface TopBarProps {
   theme: 'light' | 'dark' | 'system';
   onThemeToggle: () => void;
   onOpenCreate: () => void;
-  hasDemoSession: boolean;
-  onLoadDemo: () => void;
   user: UserAccount | null;
   onOpenAuth: () => void;
   onLogout?: () => void;
@@ -48,8 +46,6 @@ export const TopBar: React.FC<TopBarProps> = ({
   theme,
   onThemeToggle,
   onOpenCreate,
-  hasDemoSession,
-  onLoadDemo,
   user,
   onOpenAuth,
   onLogout,
@@ -295,18 +291,6 @@ export const TopBar: React.FC<TopBarProps> = ({
               title="Security & Architecture Console (Firebase & Cloudflare)"
             >
               <ShieldCheck className="w-4 h-4" />
-            </button>
-          )}
-
-          {/* Demo Button if not yet loaded */}
-          {!hasDemoSession && (
-            <button
-              type="button"
-              onClick={onLoadDemo}
-              className="hidden sm:flex items-center gap-1 px-2 py-1 text-xs font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg hover:bg-amber-100 transition-colors"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Demo</span>
             </button>
           )}
 
